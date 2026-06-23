@@ -1,0 +1,15 @@
+{
+  "name": "zoops",
+  "local_port": 50165,
+  "entrypoint": "bun run dev",
+  "publish": {
+    "label": "zoops",
+    "type": "http",
+    "entrypoint": "bun run prod",
+    "published_port": 56874,
+    "env": {
+      "NODE_ENV": "production",
+      "ZO_CLIENT_IDENTITY_TOKEN": "none"
+    }
+  }
+}

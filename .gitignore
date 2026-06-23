@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Runtime data (SQLite DB, snapshots)
+data/
+
+# Bun
+bun.lock
+.bun/
+
+# Vite cache
+node_modules/.vite
+
+# Env / secrets
+.env
+.env.*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

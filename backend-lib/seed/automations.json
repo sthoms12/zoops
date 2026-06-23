@@ -1,0 +1,102 @@
+[
+  {
+    "id": "4787b01e",
+    "title": "Weekly M365 Barometer Catalog Sync",
+    "category": "M365 Barometer",
+    "delivery_method": "email",
+    "schedule_summary": "Every Monday 8:00 AM CT",
+    "next_run": "2026-06-29T08:00:00-05:00",
+    "active": true,
+    "instruction_summary": "Update catalog: sync products, analyze new candidates, publish the three most relevant additions, and send an email digest."
+  },
+  {
+    "id": "02b995f5",
+    "title": "Daily Opportunity Vault Collection",
+    "category": "Opportunity Vault",
+    "delivery_method": null,
+    "schedule_summary": "Daily at 6:00 AM CT",
+    "next_run": "2026-06-24T06:00:00-05:00",
+    "active": true,
+    "instruction_summary": "Run opportunity discovery job, collect new leads, and log results."
+  },
+  {
+    "id": "e44fe2e2",
+    "title": "Weekly Opportunity Vault Report",
+    "category": "Opportunity Vault",
+    "delivery_method": null,
+    "schedule_summary": "Every Monday 9:00 AM CT",
+    "next_run": "2026-06-29T09:00:00-05:00",
+    "active": true,
+    "instruction_summary": "Generate weekly opportunity report with top findings and trends."
+  },
+  {
+    "id": "c6f46ba4",
+    "title": "Friction Vault Daily Discovery",
+    "category": "Friction Vault",
+    "delivery_method": null,
+    "schedule_summary": "Daily at 6:00 AM CT",
+    "next_run": "2026-06-24T06:00:00-05:00",
+    "active": true,
+    "instruction_summary": "Discover friction points, collect user pain signals, and catalog findings."
+  },
+  {
+    "id": "f7dda0f7",
+    "title": "Friction Vault Weekly Report",
+    "category": "Friction Vault",
+    "delivery_method": null,
+    "schedule_summary": "Every Wednesday 8:00 AM CT",
+    "next_run": "2026-06-24T08:00:00-05:00",
+    "active": true,
+    "instruction_summary": "Generate weekly friction report with top themes and impact analysis."
+  },
+  {
+    "id": "9a3c0001",
+    "title": "Daily Project Failure Intelligence",
+    "category": "Intelligence",
+    "delivery_method": null,
+    "schedule_summary": "Daily",
+    "next_run": null,
+    "active": true,
+    "instruction_summary": "Collect and analyze project failure patterns from public sources."
+  },
+  {
+    "id": "9a3c0002",
+    "title": "Weekly Editorial Improvement",
+    "category": "Content",
+    "delivery_method": null,
+    "schedule_summary": "Weekly",
+    "next_run": null,
+    "active": true,
+    "instruction_summary": "Review and improve PERSONA.md editorial content iteratively."
+  },
+  {
+    "id": "9a3c0003",
+    "title": "Update last30days Skill",
+    "category": "Maintenance",
+    "delivery_method": null,
+    "schedule_summary": "Weekly (GitHub sync)",
+    "next_run": null,
+    "active": true,
+    "instruction_summary": "Pull latest last30days skill updates from GitHub."
+  },
+  {
+    "id": "9a3c0004",
+    "title": "Weekly M365 Barometer Product Refresh",
+    "category": "M365 Barometer",
+    "delivery_method": null,
+    "schedule_summary": "Weekly",
+    "next_run": null,
+    "active": true,
+    "instruction_summary": "Refresh product definitions and metadata for the M365 Barometer catalog."
+  },
+  {
+    "id": "9a3c0005",
+    "title": "Troubleshooting Source Discovery",
+    "category": "Intelligence",
+    "delivery_method": null,
+    "schedule_summary": "Scheduled cycle",
+    "next_run": null,
+    "active": true,
+    "instruction_summary": "Discover and catalog troubleshooting intelligence sources."
+  }
+]
