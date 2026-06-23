@@ -48,7 +48,7 @@ export default function RunsPage() {
     <div className="p-6 space-y-5 max-w-5xl">
       <div>
         <h1 className="text-xl font-semibold">Runs</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">Workflow execution history — completed, failed, and pending review</p>
+        <p className="text-sm text-muted-foreground mt-0.5">Execution history — completed, failed, and pending review</p>
       </div>
 
       <div className="flex gap-2 flex-wrap">

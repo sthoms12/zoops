@@ -116,9 +116,6 @@ export default function SettingsPage() {
           <section>
             <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">Thresholds</h2>
             <div className="bg-card border border-border rounded-lg px-4">
-              <SettingRow label="Stale Workflow Threshold" description="Days after last run before a workflow is marked stale">
-                <SettingInput value={s.staleThresholdDays || "7"} onChange={v => update("staleThresholdDays", v)} type="number" />
-              </SettingRow>
               <SettingRow label="Disk Warning %" description="Disk usage percentage that triggers a health warning">
                 <SettingInput value={s.diskWarningPercent || "70"} onChange={v => update("diskWarningPercent", v)} type="number" />
               </SettingRow>

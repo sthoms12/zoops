@@ -6,15 +6,12 @@ import { toast } from "sonner";
 
 interface DashboardData {
   stats: {
-    activeWorkflows: number;
-    staleWorkflows: number;
     failedRuns: number;
     pendingReviews: number;
     successRate: number;
     totalRuns: number;
     serviceCount: number;
     discoveredCount: number;
-    browserTaskCount: number;
   };
   healthWarnings: string[];
   recentRuns: any[];
@@ -166,16 +163,10 @@ export default function CommandCenter({ onRefresh }: { onRefresh: () => void }) 
 
       {/* Stats grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <StatCard label="Active Workflows" value={stats.activeWorkflows} to="/workflows" color={stats.activeWorkflows > 0 ? "green" : "default"} />
-        <StatCard label="Stale Workflows" value={stats.staleWorkflows} to="/workflows" color={stats.staleWorkflows > 0 ? "yellow" : "green"} sub={stats.staleWorkflows > 0 ? "Need runs" : "All current"} />
         <StatCard label="Failed Runs" value={stats.failedRuns} to="/runs" color={stats.failedRuns > 0 ? "red" : "green"} sub={`of ${stats.totalRuns} total`} />
         <StatCard label="Pending Review" value={stats.pendingReviews} to="/review" color={stats.pendingReviews > 0 ? "yellow" : "green"} />
-      </div>
-
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <StatCard label="Run Success Rate" value={`${stats.successRate}%`} color={stats.successRate >= 80 ? "green" : stats.successRate >= 50 ? "yellow" : "red"} />
         <StatCard label="Services Tracked" value={stats.serviceCount} to="/services" color="blue" />
-        <StatCard label="Browser Tasks" value={stats.browserTaskCount} to="/browser-tasks" color="default" />
         <StatCard label="Discovered Items" value={stats.discoveredCount} to="/discovery" color="blue" />
       </div>
 
@@ -244,8 +235,6 @@ export default function CommandCenter({ onRefresh }: { onRefresh: () => void }) 
       {/* Quick links */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
         {[
-          { to: "/workflows", label: "New Workflow", icon: "+" },
-          { to: "/browser-tasks", label: "New Browser Task", icon: "+" },
           { to: "/review", label: "Review Queue", icon: <Inbox size={13} /> },
           { to: "/health", label: "Run Health Check", icon: <Activity size={13} /> },
         ].map(item => (

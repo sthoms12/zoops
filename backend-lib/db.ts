@@ -13,28 +13,6 @@ db.run("PRAGMA synchronous=NORMAL");
 db.run("PRAGMA busy_timeout=5000");
 
 export function initDb() {
-  db.run(`CREATE TABLE IF NOT EXISTS workflows (
-    id TEXT PRIMARY KEY,
-    name TEXT NOT NULL,
-    description TEXT,
-    category TEXT DEFAULT 'General',
-    prompt TEXT DEFAULT '',
-    persona TEXT,
-    model TEXT,
-    expected_output TEXT,
-    success_criteria TEXT,
-    risk_level TEXT DEFAULT 'low',
-    status TEXT DEFAULT 'active',
-    stale_after_days INTEGER DEFAULT 7,
-    last_run_at TEXT,
-    last_success_at TEXT,
-    failure_count INTEGER DEFAULT 0,
-    success_rate REAL DEFAULT 0,
-    notes TEXT,
-    created_at TEXT DEFAULT (datetime('now')),
-    updated_at TEXT DEFAULT (datetime('now'))
-  )`);
-
   db.run(`CREATE TABLE IF NOT EXISTS workflow_runs (
     id TEXT PRIMARY KEY,
     workflow_id TEXT,
@@ -52,46 +30,6 @@ export function initDb() {
     started_at TEXT,
     completed_at TEXT,
     reviewed_at TEXT,
-    created_at TEXT DEFAULT (datetime('now'))
-  )`);
-
-  db.run(`CREATE TABLE IF NOT EXISTS prompt_versions (
-    id TEXT PRIMARY KEY,
-    workflow_id TEXT,
-    version INTEGER NOT NULL,
-    prompt TEXT,
-    change_note TEXT,
-    created_at TEXT DEFAULT (datetime('now'))
-  )`);
-
-  db.run(`CREATE TABLE IF NOT EXISTS browser_tasks (
-    id TEXT PRIMARY KEY,
-    name TEXT NOT NULL,
-    site_name TEXT,
-    url TEXT,
-    goal TEXT,
-    instructions TEXT,
-    expected_output TEXT,
-    success_criteria TEXT,
-    risk_level TEXT DEFAULT 'low',
-    session_status TEXT DEFAULT 'unknown',
-    last_run_at TEXT,
-    notes TEXT,
-    status TEXT DEFAULT 'active',
-    created_at TEXT DEFAULT (datetime('now')),
-    updated_at TEXT DEFAULT (datetime('now'))
-  )`);
-
-  db.run(`CREATE TABLE IF NOT EXISTS browser_task_runs (
-    id TEXT PRIMARY KEY,
-    task_id TEXT,
-    task_name TEXT,
-    output TEXT,
-    status TEXT DEFAULT 'pending',
-    session_status TEXT,
-    notes TEXT,
-    started_at TEXT,
-    completed_at TEXT,
     created_at TEXT DEFAULT (datetime('now'))
   )`);
 

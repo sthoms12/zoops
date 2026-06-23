@@ -55,21 +55,11 @@ app.onError((err, c) => {
 
 // ── DASHBOARD ─────────────────────────────────────────────────────
 app.get("/api/dashboard", c => {
-  const workflows = db.prepare("SELECT * FROM workflows").all();
   const runs = db.prepare("SELECT * FROM workflow_runs ORDER BY created_at DESC LIMIT 50").all() as any[];
   const reviewItems = db.prepare("SELECT COUNT(*) as c FROM review_items WHERE status='pending'").get() as { c: number };
   const services = db.prepare("SELECT * FROM services").all() as any[];
-  const browserTasks = db.prepare("SELECT * FROM browser_tasks").all() as any[];
   const latestHealth = db.prepare("SELECT * FROM health_snapshots ORDER BY timestamp DESC LIMIT 1").get() as any;
   const discoveredCount = (db.prepare("SELECT COUNT(*) as c FROM discovered_items").get() as { c: number })?.c ?? 0;
-
-  const activeWorkflows = (workflows as any[]).filter(w => w.status === "active").length;
-  const staleWorkflows = (workflows as any[]).filter(w => {
-    if (w.status !== "active") return false;
-    if (!w.last_run_at) return true;
-    const daysSince = (Date.now() - new Date(w.last_run_at).getTime()) / 86400000;
-    return daysSince > (w.stale_after_days || 7);
-  }).length;
 
   const failedRuns = runs.filter(r => r.status === "failed").length;
   const completedRuns = runs.filter(r => r.status === "completed").length;
@@ -77,24 +67,17 @@ app.get("/api/dashboard", c => {
   const recentRuns = runs.slice(0, 8);
 
   const healthWarnings: string[] = [];
-  if (staleWorkflows > 0) healthWarnings.push(`${staleWorkflows} stale workflow(s)`);
   if (failedRuns > 0) healthWarnings.push(`${failedRuns} failed run(s)`);
   if (reviewItems.c > 0) healthWarnings.push(`${reviewItems.c} item(s) need review`);
 
-  const sessionIssues = (browserTasks as any[]).filter(t => ["login_expired", "needs_2fa", "blocked"].includes(t.session_status)).length;
-  if (sessionIssues > 0) healthWarnings.push(`${sessionIssues} browser session issue(s)`);
-
   return c.json({
     stats: {
-      activeWorkflows,
-      staleWorkflows,
       failedRuns,
       pendingReviews: reviewItems.c,
       successRate,
       totalRuns: runs.length,
       serviceCount: services.length,
       discoveredCount,
-      browserTaskCount: browserTasks.length,
     },
     healthWarnings,
     recentRuns,
@@ -180,84 +163,6 @@ app.post("/api/services/:id/check", async c => {
   return c.json({ id, status, note, checked_at: now() });
 });
 
-// ── WORKFLOWS ────────────────────────────────────────────────────
-app.get("/api/workflows", c => {
-  const workflows = db.prepare("SELECT * FROM workflows ORDER BY updated_at DESC").all() as any[];
-  return c.json(workflows.map(w => ({
-    ...w,
-    healthState: computeWorkflowHealth(w),
-  })));
-});
-
-app.post("/api/workflows", async c => {
-  const body = await c.req.json();
-  const id = generateId();
-  db.prepare(`INSERT INTO workflows (id,name,description,category,prompt,persona,model,expected_output,success_criteria,risk_level,status,stale_after_days,notes,failure_count,success_rate,created_at,updated_at)
-    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,0,0,?,?)`).run(
-    id, body.name, body.description || null, body.category || "General",
-    body.prompt || "", body.persona || null, body.model || null,
-    body.expected_output || null, body.success_criteria || null,
-    body.risk_level || "low", body.status || "active",
-    body.stale_after_days || 7, body.notes || null, now(), now());
-
-  if (body.prompt) {
-    db.prepare("INSERT INTO prompt_versions (id,workflow_id,version,prompt,change_note,created_at) VALUES (?,?,1,?,?,?)")
-      .run(generateId(), id, body.prompt, "Initial version", now());
-  }
-  return c.json({ id, ...body }, 201);
-});
-
-app.get("/api/workflows/:id", c => {
-  const id = c.req.param("id");
-  const wf = db.prepare("SELECT * FROM workflows WHERE id=?").get(id) as any;
-  if (!wf) return c.json({ error: "Not found" }, 404);
-  const runs = db.prepare("SELECT * FROM workflow_runs WHERE workflow_id=? ORDER BY created_at DESC LIMIT 20").all(id);
-  const promptVersions = db.prepare("SELECT * FROM prompt_versions WHERE workflow_id=? ORDER BY version DESC").all(id);
-  return c.json({ ...wf, healthState: computeWorkflowHealth(wf), runs, promptVersions });
-});
-
-app.put("/api/workflows/:id", async c => {
-  const id = c.req.param("id");
-  const body = await c.req.json();
-  const existing = db.prepare("SELECT * FROM workflows WHERE id=?").get(id) as any;
-  if (!existing) return c.json({ error: "Not found" }, 404);
-
-  db.prepare(`UPDATE workflows SET name=?,description=?,category=?,prompt=?,persona=?,model=?,expected_output=?,success_criteria=?,risk_level=?,status=?,stale_after_days=?,notes=?,updated_at=? WHERE id=?`).run(
-    body.name || existing.name, body.description ?? existing.description,
-    body.category || existing.category, body.prompt ?? existing.prompt,
-    body.persona ?? existing.persona, body.model ?? existing.model,
-    body.expected_output ?? existing.expected_output, body.success_criteria ?? existing.success_criteria,
-    body.risk_level || existing.risk_level, body.status || existing.status,
-    body.stale_after_days ?? existing.stale_after_days, body.notes ?? existing.notes, now(), id);
-
-  if (body.prompt && body.prompt !== existing.prompt) {
-    const lastVer = (db.prepare("SELECT MAX(version) as v FROM prompt_versions WHERE workflow_id=?").get(id) as any)?.v ?? 0;
-    db.prepare("INSERT INTO prompt_versions (id,workflow_id,version,prompt,change_note,created_at) VALUES (?,?,?,?,?,?)")
-      .run(generateId(), id, lastVer + 1, body.prompt, body.changeNote || "Updated", now());
-  }
-  return c.json({ id, ...body });
-});
-
-app.delete("/api/workflows/:id", c => {
-  const id = c.req.param("id");
-  db.prepare("DELETE FROM workflow_runs WHERE workflow_id=?").run(id);
-  db.prepare("DELETE FROM prompt_versions WHERE workflow_id=?").run(id);
-  db.prepare("DELETE FROM workflows WHERE id=?").run(id);
-  return c.json({ ok: true });
-});
-
-function computeWorkflowHealth(w: any): string {
-  if (w.status === "archived") return "archived";
-  if (w.status === "paused") return "paused";
-  if (w.status === "draft") return "draft";
-  if (w.failure_count > 2 && w.success_rate < 0.5) return "failing";
-  if (!w.last_run_at) return "stale";
-  const daysSince = (Date.now() - new Date(w.last_run_at).getTime()) / 86400000;
-  if (daysSince > (w.stale_after_days || 7)) return "stale";
-  if (w.failure_count > 0) return "needs_review";
-  return "healthy";
-}
-
 // ── RUNS ─────────────────────────────────────────────────────────
 app.get("/api/runs", c => {
   const { workflowId, status, limit = "50" } = c.req.query();
@@ -330,11 +235,9 @@ app.patch("/api/runs/:id", async c => {
 // ── NEEDS REVIEW ─────────────────────────────────────────────────
 app.get("/api/reviews", c => {
   const items = db.prepare("SELECT * FROM review_items WHERE status='pending' ORDER BY priority DESC, created_at ASC").all();
-  // Also include failed/needs_review runs
   const runItems = db.prepare("SELECT * FROM workflow_runs WHERE status IN ('needs_review','failed') AND (review_status='pending' OR review_status IS NULL) ORDER BY created_at DESC").all() as any[];
-  const btItems = db.prepare("SELECT * FROM browser_tasks WHERE session_status IN ('login_expired','needs_2fa','blocked') ORDER BY updated_at DESC").all() as any[];
 
-  return c.json({ reviewItems: items, needsReviewRuns: runItems, browserSessionIssues: btItems });
+  return c.json({ reviewItems: items, needsReviewRuns: runItems });
 });
 
 app.patch("/api/reviews/:id", async c => {
@@ -352,76 +255,6 @@ app.post("/api/reviews", async c => {
     .run(id, body.type || "general", body.ref_id || null, body.title, body.description || null,
       "pending", body.priority || "normal", body.notes || null, now());
   return c.json({ id, ...body }, 201);
-});
-
-// ── BROWSER TASKS ────────────────────────────────────────────────
-app.get("/api/browser-tasks", c => c.json(db.prepare("SELECT * FROM browser_tasks ORDER BY updated_at DESC").all()));
-
-app.post("/api/browser-tasks", async c => {
-  const body = await c.req.json();
-  const id = generateId();
-  db.prepare(`INSERT INTO browser_tasks (id,name,site_name,url,goal,instructions,expected_output,success_criteria,risk_level,session_status,notes,status,created_at,updated_at)
-    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`).run(
-    id, body.name, body.site_name || null, body.url || null, body.goal || null,
-    body.instructions || null, body.expected_output || null, body.success_criteria || null,
-    body.risk_level || "low", body.session_status || "unknown", body.notes || null,
-    body.status || "active", now(), now());
-  return c.json({ id, ...body }, 201);
-});
-
-app.put("/api/browser-tasks/:id", async c => {
-  const id = c.req.param("id");
-  const body = await c.req.json();
-  db.prepare(`UPDATE browser_tasks SET name=?,site_name=?,url=?,goal=?,instructions=?,expected_output=?,success_criteria=?,risk_level=?,session_status=?,notes=?,status=?,updated_at=? WHERE id=?`)
-    .run(body.name, body.site_name || null, body.url || null, body.goal || null,
-      body.instructions || null, body.expected_output || null, body.success_criteria || null,
-      body.risk_level || "low", body.session_status || "unknown", body.notes || null,
-      body.status || "active", now(), id);
-  return c.json({ id, ...body });
-});
-
-app.delete("/api/browser-tasks/:id", c => {
-  db.prepare("DELETE FROM browser_tasks WHERE id=?").run(c.req.param("id"));
-  return c.json({ ok: true });
-});
-
-app.post("/api/browser-tasks/:id/runs", async c => {
-  const id = c.req.param("id");
-  const body = await c.req.json();
-  const task = db.prepare("SELECT name FROM browser_tasks WHERE id=?").get(id) as any;
-  const runId = generateId();
-  db.prepare(`INSERT INTO browser_task_runs (id,task_id,task_name,output,status,session_status,notes,started_at,completed_at,created_at) VALUES (?,?,?,?,?,?,?,?,?,?)`)
-    .run(runId, id, task?.name || "Unknown", body.output || null, body.status || "pending",
-      body.session_status || null, body.notes || null, body.started_at || now(), body.completed_at || null, now());
-  if (body.session_status) {
-    db.prepare("UPDATE browser_tasks SET session_status=?,last_run_at=?,updated_at=? WHERE id=?")
-      .run(body.session_status, now(), now(), id);
-  }
-  return c.json({ id: runId, ...body }, 201);
-});
-
-// ── PROMPT REGISTRY ──────────────────────────────────────────────
-app.get("/api/prompts", c => {
-  const workflows = db.prepare("SELECT id,name FROM workflows").all() as any[];
-  const versions = db.prepare("SELECT * FROM prompt_versions ORDER BY workflow_id, version DESC").all() as any[];
-  return c.json({ workflows, versions });
-});
-
-app.get("/api/prompts/:workflowId", c => {
-  const versions = db.prepare("SELECT * FROM prompt_versions WHERE workflow_id=? ORDER BY version DESC").all(c.req.param("workflowId"));
-  return c.json(versions);
-});
-
-app.post("/api/prompts/:workflowId", async c => {
-  const workflowId = c.req.param("workflowId");
-  const body = await c.req.json();
-  const lastVer = (db.prepare("SELECT MAX(version) as v FROM prompt_versions WHERE workflow_id=?").get(workflowId) as any)?.v ?? 0;
-  const id = generateId();
-  db.prepare("INSERT INTO prompt_versions (id,workflow_id,version,prompt,change_note,created_at) VALUES (?,?,?,?,?,?)")
-    .run(id, workflowId, lastVer + 1, body.prompt, body.change_note || null, now());
-  // Update workflow's active prompt
-  db.prepare("UPDATE workflows SET prompt=?,updated_at=? WHERE id=?").run(body.prompt, now(), workflowId);
-  return c.json({ id, workflowId, version: lastVer + 1, ...body }, 201);
 });
 
 // ── AUTOMATIONS (Zo Agents) ─────────────────────────────────────

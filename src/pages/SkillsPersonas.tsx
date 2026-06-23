@@ -19,7 +19,6 @@ function EntryRow({ entry, onEdit, onDelete }: { entry: any; onEdit: (e: any) =>
           {entry.is_auto_detected ? <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400">auto</span> : null}
         </div>
         {entry.purpose && <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{entry.purpose}</p>}
-        {entry.related_workflow && <p className="text-xs text-zinc-600 mt-0.5">Workflow: {entry.related_workflow}</p>}
         {entry.path && <p className="text-[10px] font-mono text-zinc-600 mt-0.5 truncate">{entry.path.replace("/home/workspace/", "workspace/")}</p>}
       </div>
       <div className="flex items-center gap-2 shrink-0">
@@ -45,7 +44,6 @@ function EntryModal({ entry, onClose, onSaved }: { entry?: any; onClose: () => v
     path: entry?.path || "",
     purpose: entry?.purpose || "",
     notes: entry?.notes || "",
-    related_workflow: entry?.related_workflow || "",
     last_reviewed_at: entry?.last_reviewed_at || "",
   });
   const [saving, setSaving] = useState(false);
@@ -98,15 +96,10 @@ function EntryModal({ entry, onClose, onSaved }: { entry?: any; onClose: () => v
               <textarea className="w-full h-20 px-3 py-2 text-sm bg-input border border-border rounded-md text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring resize-none"
                 value={form.purpose} onChange={e => setForm(p => ({ ...p, purpose: e.target.value }))} placeholder="What does this skill or persona do?" />
             </div>
-            <div>
+            <div className="col-span-2">
               <label className="text-xs text-muted-foreground block mb-1">File Path</label>
               <input className="w-full h-9 px-3 text-sm bg-input border border-border rounded-md text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
                 value={form.path} onChange={e => setForm(p => ({ ...p, path: e.target.value }))} placeholder="/home/workspace/Skills/..." />
-            </div>
-            <div>
-              <label className="text-xs text-muted-foreground block mb-1">Related Workflow</label>
-              <input className="w-full h-9 px-3 text-sm bg-input border border-border rounded-md text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
-                value={form.related_workflow} onChange={e => setForm(p => ({ ...p, related_workflow: e.target.value }))} placeholder="Workflow name" />
             </div>
             <div className="col-span-2">
               <label className="text-xs text-muted-foreground block mb-1">Notes</label>

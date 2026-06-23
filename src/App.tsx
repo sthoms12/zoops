@@ -1,7 +1,7 @@
 import { BrowserRouter, Route, Routes, Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import {
-  LayoutDashboard, Search, Server, Workflow, Play, Inbox, Globe, FileText,
+  LayoutDashboard, Search, Server, Play, Inbox,
   Brain, Activity, Settings as SettingsIcon, Zap, Menu, X,
 } from "lucide-react";
 import { Toaster } from "sonner";
@@ -11,13 +11,9 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import CommandCenter from "@/pages/CommandCenter";
 import DiscoveryPage from "@/pages/Discovery";
 import ServicesPage from "@/pages/Services";
-import WorkflowsPage from "@/pages/Workflows";
-import WorkflowDetail from "@/pages/WorkflowDetail";
 import RunsPage from "@/pages/Runs";
 import RunDetail from "@/pages/RunDetail";
 import NeedsReview from "@/pages/NeedsReview";
-import BrowserTasks from "@/pages/BrowserTasks";
-import PromptRegistry from "@/pages/PromptRegistry";
 import SkillsPersonas from "@/pages/SkillsPersonas";
 import HealthPage from "@/pages/Health";
 import SettingsPage from "@/pages/Settings";
@@ -49,22 +45,14 @@ const navGroups: NavGroup[] = [
     items: [
       { to: "/services", icon: <Server size={15} />, label: "Services" },
       { to: "/automations", icon: <Zap size={15} />, label: "Automations" },
-      { to: "/workflows", icon: <Workflow size={15} />, label: "Workflows" },
       { to: "/runs", icon: <Play size={15} />, label: "Runs" },
       { to: "/review", icon: <Inbox size={15} />, label: "Needs Review", badgeKey: "pendingReviews" },
     ],
   },
   {
-    label: "Intelligence",
-    items: [
-      { to: "/browser-tasks", icon: <Globe size={15} />, label: "Browser Tasks" },
-      { to: "/prompts", icon: <FileText size={15} />, label: "Prompt Registry" },
-      { to: "/skills-personas", icon: <Brain size={15} />, label: "Skills & Personas" },
-    ],
-  },
-  {
     label: "System",
     items: [
+      { to: "/skills-personas", icon: <Brain size={15} />, label: "Skills & Personas" },
       { to: "/health", icon: <Activity size={15} />, label: "Health" },
       { to: "/settings", icon: <SettingsIcon size={15} />, label: "Settings" },
     ],
@@ -249,13 +237,9 @@ function AppShell() {
             <Route path="/discovery" element={<ErrorBoundary label="Discovery"><DiscoveryPage /></ErrorBoundary>} />
             <Route path="/services" element={<ErrorBoundary label="Services"><ServicesPage /></ErrorBoundary>} />
             <Route path="/automations" element={<ErrorBoundary label="Automations"><AutomationsPage /></ErrorBoundary>} />
-            <Route path="/workflows" element={<ErrorBoundary label="Workflows"><WorkflowsPage /></ErrorBoundary>} />
-            <Route path="/workflows/:id" element={<ErrorBoundary label="Workflow Detail"><WorkflowDetail /></ErrorBoundary>} />
             <Route path="/runs" element={<ErrorBoundary label="Runs"><RunsPage /></ErrorBoundary>} />
             <Route path="/runs/:id" element={<ErrorBoundary label="Run Detail"><RunDetail /></ErrorBoundary>} />
             <Route path="/review" element={<ErrorBoundary label="Needs Review"><NeedsReview onRefresh={fetchDashboard} /></ErrorBoundary>} />
-            <Route path="/browser-tasks" element={<ErrorBoundary label="Browser Tasks"><BrowserTasks /></ErrorBoundary>} />
-            <Route path="/prompts" element={<ErrorBoundary label="Prompt Registry"><PromptRegistry /></ErrorBoundary>} />
             <Route path="/skills-personas" element={<ErrorBoundary label="Skills & Personas"><SkillsPersonas /></ErrorBoundary>} />
             <Route path="/health" element={<ErrorBoundary label="Health"><HealthPage /></ErrorBoundary>} />
             <Route path="/settings" element={<ErrorBoundary label="Settings"><SettingsPage /></ErrorBoundary>} />
