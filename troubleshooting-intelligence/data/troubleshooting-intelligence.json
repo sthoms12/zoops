@@ -1,0 +1,1365 @@
+{
+  "generatedAt": "2026-06-18T00:00:00.000Z",
+  "updatedAt": "2026-06-21T23:05:40.732Z",
+  "taxonomy": {
+    "signalCategories": {
+      "Leadership": [
+        "executive sponsorship instability",
+        "leadership turnover",
+        "conflicting priorities"
+      ],
+      "Governance": [
+        "weak governance",
+        "scope creep",
+        "undefined ownership",
+        "late risk escalation",
+        "unrealistic timeline"
+      ],
+      "Change Management": [
+        "user resistance",
+        "communication gaps",
+        "training deficiencies"
+      ],
+      "Technical": [
+        "technical debt",
+        "integration complexity",
+        "legacy dependencies",
+        "testing gaps",
+        "excessive customization",
+        "data migration quality",
+        "platform instability"
+      ],
+      "Resource": [
+        "staffing shortages",
+        "budget constraints",
+        "skill gaps",
+        "vendor dependency"
+      ],
+      "Operating Model": [
+        "process redesign failure",
+        "unclear success metrics",
+        "insufficient contingency planning"
+      ]
+    },
+    "lessonTaxonomy": [
+      "define measurable outcomes early",
+      "establish executive sponsorship",
+      "reduce big-bang scope",
+      "pilot before full deployment",
+      "align process design before technology rollout",
+      "strengthen testing and rollback plans",
+      "retain in-house program expertise",
+      "engage end users early",
+      "treat integration as a first-class workstream",
+      "match contracts and governance to delivery reality"
+    ],
+    "troubleshooting": {
+      "technologyAreas": [
+        "Microsoft 365",
+        "Identity & Access Management",
+        "Endpoint Management",
+        "Security",
+        "Networking",
+        "Cloud Infrastructure",
+        "AI & Automation",
+        "Applications",
+        "Other"
+      ],
+      "mistakeTypes": [
+        "premature-root-cause",
+        "resilience-assumption",
+        "diagnostic-surface-misdirection",
+        "retry-amplification-blindness",
+        "recovery-path-blindness",
+        "dependency-chain-truncation"
+      ],
+      "evidenceSourceTypes": [
+        "time-correlated-telemetry",
+        "rollout-change-history",
+        "cross-region-comparison",
+        "dependency-health-signal",
+        "protocol-native-evidence",
+        "physical-infrastructure-signal",
+        "customer-symptom",
+        "external-observation"
+      ],
+      "investigationTechniqueTypes": [
+        "fault-domain-bounding",
+        "dependency-chain-reconstruction",
+        "comparative-analysis",
+        "recurrence-analysis",
+        "protocol-level-validation",
+        "recovery-sequencing"
+      ],
+      "incorrectAssumptionTypes": [
+        "healthy-network-means-healthy-service",
+        "managed-service-will-absorb-failure",
+        "mitigation-success-proves-diagnosis",
+        "availability-zones-localize-failure",
+        "initiator-explains-recovery-duration"
+      ],
+      "turningPointTypes": [
+        "comparative-evidence",
+        "repeat-occurrence",
+        "dependency-correlation",
+        "load-pattern-shift",
+        "protocol-detail",
+        "recovery-bottleneck"
+      ]
+    }
+  },
+  "collectionModules": [
+    {
+      "id": "troubleshooting-intelligence",
+      "name": "Troubleshooting Intelligence",
+      "sourceType": "analyst-curated",
+      "status": "active",
+      "focus": [
+        "troubleshooting",
+        "incident-analysis",
+        "reasoning"
+      ]
+    }
+  ],
+  "collectorBacklog": [],
+  "collector": {
+    "settings": {
+      "automationEnabled": true,
+      "automationSchedule": "RRULE:FREQ=DAILY;INTERVAL=3;BYHOUR=18;BYMINUTE=0",
+      "automationTimezone": "America/Chicago",
+      "maxItemsPerRun": 2,
+      "sourceTextCharLimit": 16000,
+      "lastRunAt": "2026-06-21T23:05:40.732Z",
+      "lastRunStatus": "succeeded"
+    },
+    "runs": [
+      {
+        "id": "troubleshooting-collector-run-1782083113410",
+        "trigger": "automation",
+        "status": "succeeded",
+        "startedAt": "2026-06-21T23:05:13.410Z",
+        "completedAt": "2026-06-21T23:05:40.732Z",
+        "itemsRequested": 1,
+        "itemsProcessed": 1,
+        "draftsCreated": 1,
+        "duplicatesSkipped": 0,
+        "backlogRemaining": 0,
+        "notes": [
+          "Created troubleshooting draft for Anthropic Claude Code Quality Degradation Postmortem."
+        ]
+      },
+      {
+        "id": "troubleshooting-collector-run-1782083077526",
+        "trigger": "automation",
+        "status": "succeeded",
+        "startedAt": "2026-06-21T23:04:37.526Z",
+        "completedAt": "2026-06-21T23:05:02.631Z",
+        "itemsRequested": 1,
+        "itemsProcessed": 1,
+        "draftsCreated": 1,
+        "duplicatesSkipped": 0,
+        "backlogRemaining": 0,
+        "notes": [
+          "Created troubleshooting draft for Discord Voice Outage Postmortem (March 25, 2026)."
+        ]
+      },
+      {
+        "id": "troubleshooting-collector-run-1782083062376",
+        "trigger": "manual",
+        "startedAt": "2026-06-21T23:04:22.376Z",
+        "completedAt": "2026-06-21T23:04:22.376Z",
+        "itemsRequested": 2,
+        "itemsProcessed": 0,
+        "draftsCreated": 0,
+        "duplicatesSkipped": 0,
+        "backlogRemaining": 0,
+        "notes": [
+          "No troubleshooting backlog items were available."
+        ],
+        "status": "succeeded"
+      },
+      {
+        "id": "troubleshooting-collector-run-1782055935356",
+        "trigger": "manual",
+        "status": "succeeded",
+        "startedAt": "2026-06-21T15:32:15.356Z",
+        "completedAt": "2026-06-21T15:32:46.704Z",
+        "itemsRequested": 1,
+        "itemsProcessed": 1,
+        "draftsCreated": 1,
+        "duplicatesSkipped": 0,
+        "backlogRemaining": 4,
+        "notes": [
+          "Created troubleshooting draft for India Telegram BGP incident analysis retry 2."
+        ]
+      },
+      {
+        "id": "troubleshooting-collector-run-1782055788484",
+        "trigger": "manual",
+        "status": "failed",
+        "startedAt": "2026-06-21T15:29:48.484Z",
+        "completedAt": "2026-06-21T15:30:08.715Z",
+        "itemsRequested": 1,
+        "itemsProcessed": 0,
+        "draftsCreated": 0,
+        "duplicatesSkipped": 0,
+        "backlogRemaining": 4,
+        "notes": [
+          "Failed Cloudflare route leak analysis article: JSON Parse error: Unexpected EOF"
+        ]
+      },
+      {
+        "id": "troubleshooting-collector-run-1782055754370",
+        "trigger": "manual",
+        "status": "failed",
+        "startedAt": "2026-06-21T15:29:14.370Z",
+        "completedAt": "2026-06-21T15:29:32.944Z",
+        "itemsRequested": 1,
+        "itemsProcessed": 0,
+        "draftsCreated": 0,
+        "duplicatesSkipped": 0,
+        "backlogRemaining": 3,
+        "notes": [
+          "Failed India Telegram BGP incident analysis retry: JSON Parse error: Unexpected EOF"
+        ]
+      },
+      {
+        "id": "troubleshooting-collector-run-1782055650882",
+        "trigger": "manual",
+        "status": "failed",
+        "startedAt": "2026-06-21T15:27:30.882Z",
+        "completedAt": "2026-06-21T15:28:13.731Z",
+        "itemsRequested": 1,
+        "itemsProcessed": 0,
+        "draftsCreated": 0,
+        "duplicatesSkipped": 0,
+        "backlogRemaining": 2,
+        "notes": [
+          "Failed India Telegram BGP incident analysis: JSON Parse error: Unexpected EOF"
+        ]
+      },
+      {
+        "id": "troubleshooting-collector-run-1782055581562",
+        "trigger": "manual",
+        "status": "failed",
+        "startedAt": "2026-06-21T15:26:21.562Z",
+        "completedAt": "2026-06-21T15:27:28.773Z",
+        "itemsRequested": 1,
+        "itemsProcessed": 0,
+        "draftsCreated": 0,
+        "duplicatesSkipped": 0,
+        "backlogRemaining": 1,
+        "notes": [
+          "Failed Honeycomb Kafka maintenance incident report: [\n  {\n    \"origin\": \"string\",\n    \"code\": \"too_small\",\n    \"minimum\": 50,\n    \"inclusive\": true,\n    \"path\": [\n      \"problemSummary\"\n    ],\n    \"message\": \"Too small: expected string to have >=50 characters\"\n  },\n  {\n    \"origin\": \"array\",\n    \"code\": \"too_small\",\n    \"minimum\": 3,\n    \"inclusive\": true,\n    \"path\": [\n      \"investigationTimeline\"\n    ],\n    \"message\": \"Too small: expected array to have >=3 items\"\n  }\n]"
+        ]
+      }
+    ]
+  },
+  "troubleshootingCases": [
+    {
+      "id": "tc-2026-04-23-anthropic-claude-code-quality-degradation-postmortem",
+      "slug": "anthropic-claude-code-quality-degradation-postmortem",
+      "status": "draft",
+      "reviewStatus": "pending_review",
+      "title": "Anthropic Claude Code Quality Degradation Postmortem",
+      "sourceTitle": "An update on recent Claude Code quality reports \\ Anthropic",
+      "sourceUrl": "https://anthropic.com/engineering/april-23-postmortem",
+      "sourceType": "Vendor incident analysis",
+      "date": "2026-04-23",
+      "technologyArea": "AI & Automation",
+      "problemSummary": "Manual troubleshooting collector request. Manual troubleshooting collector request",
+      "sourceExtraction": {
+        "problemStatement": "Manual troubleshooting collector request.",
+        "initialAssumptions": [
+          "The initial fault domain was ambiguous from the top-level symptom alone."
+        ],
+        "investigationTimeline": [
+          {
+            "order": 1,
+            "action": "Review the source investigation",
+            "outcome": "The source contained a troubleshooting sequence that should be reviewed and structured by an analyst before publication."
+          },
+          {
+            "order": 2,
+            "action": "Collect supporting evidence",
+            "outcome": "The analyst should extract the key observations, comparisons, or telemetry that materially narrowed the diagnosis."
+          },
+          {
+            "order": 3,
+            "action": "Confirm restoration path",
+            "outcome": "The analyst should verify how the source describes mitigation, validation, and recovery sequencing before publication."
+          }
+        ],
+        "evidenceCollected": [
+          {
+            "sourceType": "external-observation",
+            "detail": "Source narrative",
+            "finding": "The source contains enough incident detail for analyst review, but the evidence structure should be refined before publication."
+          },
+          {
+            "sourceType": "customer-symptom",
+            "detail": "Reported impact",
+            "finding": "The externally visible symptom should be confirmed and sharpened during analyst review before publishing the case."
+          }
+        ],
+        "deadEnds": [],
+        "keyTurningPoints": [
+          "Comparative or protocol-level evidence narrowed the diagnosis materially."
+        ],
+        "rootCause": "The root cause was identified through the investigation described in the source.",
+        "resolution": "The source describes how the service was restored after the root cause was isolated.",
+        "lessonsLearned": [
+          "Preserve the diagnostic sequence and evidence, not only the final fix."
+        ]
+      },
+      "analystSynthesis": {
+        "effectiveTechniques": [
+          "Follow the evidence in order and keep narrowing the fault domain."
+        ],
+        "commonMistakes": [
+          "Stopping too early at the first plausible explanation."
+        ],
+        "incorrectAssumptions": [],
+        "highValueEvidenceSources": [
+          "Source narrative: The source contains enough incident detail for analyst review, but the evidence structure should be refined before publication.",
+          "Reported impact: The externally visible symptom should be confirmed and sharpened during analyst review before publishing the case."
+        ],
+        "diagnosticShortcuts": [],
+        "antiPatterns": [],
+        "troubleshootingPrinciples": [
+          "Preserve the diagnostic sequence and evidence, not only the final fix."
+        ],
+        "skillIndicators": {
+          "beginner": [
+            "Notices the symptom but has not yet separated symptom from cause."
+          ],
+          "intermediate": [
+            "Begins comparing evidence sources instead of trusting the first explanation."
+          ],
+          "advanced": [
+            "Uses comparative evidence and sequencing to narrow the fault domain."
+          ],
+          "expert": [
+            "Preserves the reasoning process clearly enough that others can reuse it."
+          ]
+        },
+        "complexityScore": 6,
+        "complexityJustification": "The case involves enough ambiguity and evidence collection to teach a reusable troubleshooting process."
+      },
+      "confidence": "medium",
+      "caseOfWeekEligible": false
+    },
+    {
+      "id": "tc-2026-04-29-discord-voice-outage-postmortem-march-25-2026",
+      "slug": "discord-voice-outage-postmortem-march-25-2026",
+      "status": "draft",
+      "reviewStatus": "pending_review",
+      "title": "Discord Voice Outage Postmortem (March 25, 2026)",
+      "sourceTitle": "You’ve Got (Too Much) Mail: Behind the Scenes of the 3/25/26 Voice Outage",
+      "sourceUrl": "https://discord.com/blog/behind-the-scenes-of-the-3-25-26-voice-outage",
+      "sourceType": "Vendor incident analysis",
+      "date": "2026-04-29",
+      "technologyArea": "Networking",
+      "problemSummary": "Manual troubleshooting collector request. Manual troubleshooting collector request",
+      "sourceExtraction": {
+        "problemStatement": "Manual troubleshooting collector request.",
+        "initialAssumptions": [
+          "The initial fault domain was ambiguous from the top-level symptom alone."
+        ],
+        "investigationTimeline": [
+          {
+            "order": 1,
+            "action": "Review the source investigation",
+            "outcome": "The source contained a troubleshooting sequence that should be reviewed and structured by an analyst before publication."
+          },
+          {
+            "order": 2,
+            "action": "Collect supporting evidence",
+            "outcome": "The analyst should extract the key observations, comparisons, or telemetry that materially narrowed the diagnosis."
+          },
+          {
+            "order": 3,
+            "action": "Confirm restoration path",
+            "outcome": "The analyst should verify how the source describes mitigation, validation, and recovery sequencing before publication."
+          }
+        ],
+        "evidenceCollected": [
+          {
+            "sourceType": "external-observation",
+            "detail": "Source narrative",
+            "finding": "The source contains enough incident detail for analyst review, but the evidence structure should be refined before publication."
+          },
+          {
+            "sourceType": "customer-symptom",
+            "detail": "Reported impact",
+            "finding": "The externally visible symptom should be confirmed and sharpened during analyst review before publishing the case."
+          }
+        ],
+        "deadEnds": [],
+        "keyTurningPoints": [
+          "Comparative or protocol-level evidence narrowed the diagnosis materially."
+        ],
+        "rootCause": "The root cause was identified through the investigation described in the source.",
+        "resolution": "The source describes how the service was restored after the root cause was isolated.",
+        "lessonsLearned": [
+          "Preserve the diagnostic sequence and evidence, not only the final fix."
+        ]
+      },
+      "analystSynthesis": {
+        "effectiveTechniques": [
+          "Follow the evidence in order and keep narrowing the fault domain."
+        ],
+        "commonMistakes": [
+          "Stopping too early at the first plausible explanation."
+        ],
+        "incorrectAssumptions": [],
+        "highValueEvidenceSources": [
+          "Source narrative: The source contains enough incident detail for analyst review, but the evidence structure should be refined before publication.",
+          "Reported impact: The externally visible symptom should be confirmed and sharpened during analyst review before publishing the case."
+        ],
+        "diagnosticShortcuts": [],
+        "antiPatterns": [],
+        "troubleshootingPrinciples": [
+          "Preserve the diagnostic sequence and evidence, not only the final fix."
+        ],
+        "skillIndicators": {
+          "beginner": [
+            "Notices the symptom but has not yet separated symptom from cause."
+          ],
+          "intermediate": [
+            "Begins comparing evidence sources instead of trusting the first explanation."
+          ],
+          "advanced": [
+            "Uses comparative evidence and sequencing to narrow the fault domain."
+          ],
+          "expert": [
+            "Preserves the reasoning process clearly enough that others can reuse it."
+          ]
+        },
+        "complexityScore": 6,
+        "complexityJustification": "The case involves enough ambiguity and evidence collection to teach a reusable troubleshooting process."
+      },
+      "confidence": "medium",
+      "caseOfWeekEligible": false
+    },
+    {
+      "id": "tc-2026-05-06-cloudflare-de-dnssec",
+      "slug": "cloudflare-de-dnssec-outage-response",
+      "status": "published",
+      "reviewStatus": "approved",
+      "title": "Cloudflare .de DNSSEC outage response",
+      "sourceTitle": "When DNSSEC goes wrong: how we responded to the .de TLD outage",
+      "sourceUrl": "https://blog.cloudflare.com/de-tld-outage-dnssec/",
+      "sourceType": "Vendor incident analysis",
+      "date": "2026-05-06",
+      "technologyArea": "Networking",
+      "problemSummary": "Broken DNSSEC signatures at the .de TLD caused validating resolvers to return SERVFAIL for fresh lookups. Cloudflare had to distinguish cached success from fresh-resolution failure, account for retry-driven traffic inflation, and decide whether to bypass DNSSEC validation temporarily to restore service.",
+      "sourceExtraction": {
+        "problemStatement": "Users resolving .de domains through 1.1.1.1 saw failures once cached records expired because fresh responses from DENIC contained invalid DNSSEC signatures.",
+        "initialAssumptions": [
+          "The top-level SERVFAIL symptom could be interpreted as generic upstream reachability trouble.",
+          "Serve-stale behavior and overall NOERROR volume could make the incident appear less severe than fresh lookups actually were."
+        ],
+        "investigationTimeline": [
+          {
+            "order": 1,
+            "action": "Compare resolver response codes beginning at incident start.",
+            "outcome": "Cloudflare saw a SERVFAIL spike starting around 19:30 UTC on May 5 as validating lookups began failing."
+          },
+          {
+            "order": 2,
+            "action": "Separate cached responses from fresh-resolution behavior.",
+            "outcome": "Investigators confirmed that serve-stale was masking part of the user impact while fresh resolutions were failing."
+          },
+          {
+            "order": 3,
+            "action": "Inspect Extended DNS Error behavior and DNSSEC validation details.",
+            "outcome": "They found 1.1.1.1 was surfacing EDE 22 instead of a DNSSEC-specific error, which pointed at the wrong layer."
+          },
+          {
+            "order": 4,
+            "action": "Assess mitigation options for a parent-zone signing failure.",
+            "outcome": "The team chose an override equivalent to a Negative Trust Anchor to treat .de as insecure temporarily."
+          },
+          {
+            "order": 5,
+            "action": "Coordinate mitigation rollout and operator communication.",
+            "outcome": "The mitigation was rolled out at 22:17 UTC and shared with peer DNS operators while DENIC fixed the zone."
+          }
+        ],
+        "evidenceCollected": [
+          {
+            "sourceType": "time-correlated-telemetry",
+            "detail": "Resolver response-code trend",
+            "finding": "SERVFAIL climbed over several hours as cached .de records expired."
+          },
+          {
+            "sourceType": "customer-symptom",
+            "detail": "Query volume inflation",
+            "finding": "Retry traffic inflated raw query counts, making volume look worse than unique user impact."
+          },
+          {
+            "sourceType": "protocol-native-evidence",
+            "detail": "DNSSEC validation and EDE behavior",
+            "finding": "Broken RRSIGs caused validation failure, but 1.1.1.1 surfaced EDE 22 instead of DNSSEC Bogus."
+          },
+          {
+            "sourceType": "dependency-health-signal",
+            "detail": "Serve-stale cache behavior",
+            "finding": "Cached responses continued serving successfully even while fresh lookups failed."
+          }
+        ],
+        "deadEnds": [
+          "Treating the EDE output as authoritative would have kept attention on connectivity rather than DNSSEC validation."
+        ],
+        "keyTurningPoints": [
+          "Separating stale-cache success from fresh-resolution failure narrowed the fault domain quickly.",
+          "Recognizing that retries were inflating demand clarified that raw volume was not equal to raw impact.",
+          "Choosing an NTA-equivalent override reframed the response as a tradeoff between validation purity and service restoration."
+        ],
+        "rootCause": "DENIC published incorrect DNSSEC signatures for the .de zone, forcing validating resolvers to reject fresh answers.",
+        "resolution": "Cloudflare temporarily marked .de as insecure on the relevant resolvers, restoring service while DENIC corrected the signing issue.",
+        "lessonsLearned": [
+          "Protocol-level evidence is more reliable than generic resolver error labels.",
+          "Cache-hit behavior can hide the true shape of impact during DNS incidents.",
+          "Shared-infrastructure incidents need pre-approved exception paths such as NTAs."
+        ]
+      },
+      "analystSynthesis": {
+        "effectiveTechniques": [
+          "Fault-domain bounding through cache-served versus fresh-resolution comparison.",
+          "Protocol-level validation using DNSSEC and EDE details instead of generic status text.",
+          "Explicit accounting for retry amplification before judging demand patterns."
+        ],
+        "commonMistakes": [
+          "Trusting top-level error labels as direct root-cause evidence.",
+          "Reading inflated retry traffic as independent user demand."
+        ],
+        "incorrectAssumptions": [
+          "Diagnostic surfaces will automatically identify the real failing layer."
+        ],
+        "highValueEvidenceSources": [
+          "Resolver response-code telemetry.",
+          "Serve-stale cache behavior.",
+          "DNSSEC validation and EDE details."
+        ],
+        "diagnosticShortcuts": [
+          "Ask what still resolves from cache before assuming total DNS failure.",
+          "Inspect protocol-native error details before following human-readable labels."
+        ],
+        "antiPatterns": [
+          "Stopping at SERVFAIL without checking why the resolver chose it."
+        ],
+        "troubleshootingPrinciples": [
+          "Separate preserved behavior from failed behavior early.",
+          "During shared infrastructure incidents, preplanned exception policies accelerate recovery."
+        ],
+        "skillIndicators": {
+          "beginner": [
+            "Notices SERVFAIL but does not separate stale-cache success from fresh-resolution failure."
+          ],
+          "intermediate": [
+            "Compares cached and uncached behavior to narrow scope."
+          ],
+          "advanced": [
+            "Uses protocol-level evidence and retry patterns to explain observed symptoms."
+          ],
+          "expert": [
+            "Balances security and restoration tradeoffs explicitly and coordinates with peer operators."
+          ]
+        },
+        "complexityScore": 7,
+        "complexityJustification": "The incident crossed protocol validation, resolver behavior, cache semantics, and operational tradeoffs under Internet-scale demand, but the root mechanism became clear once the DNSSEC layer was isolated."
+      },
+      "confidence": "high",
+      "caseOfWeekEligible": true
+    },
+    {
+      "id": "tc-2026-06-01-coinbase-may-7-outage",
+      "slug": "coinbase-may-7-2026-outage-postmortem",
+      "status": "published",
+      "reviewStatus": "approved",
+      "title": "Coinbase May 7, 2026 outage postmortem",
+      "sourceTitle": "A postmortem of our May 7, 2026 outage",
+      "sourceUrl": "https://www.coinbase.com/blog/a-postmortem-of-our-may-7-2026-outage",
+      "sourceType": "Vendor postmortem",
+      "date": "2026-06-01",
+      "technologyArea": "Cloud Infrastructure",
+      "problemSummary": "A severe service outage interrupted trading and most customer-facing functions. The investigation had to trace a facility event through quorum loss, Kafka leader-election problems, and staged recovery blockers rather than stopping at the first platform symptom.",
+      "sourceExtraction": {
+        "problemStatement": "On May 7, 2026, Coinbase experienced severe service disruption for roughly eight hours, with another twelve hours required for full recovery.",
+        "initialAssumptions": [
+          "Losing zonal capacity should degrade the exchange but not halt it entirely.",
+          "Restoring matching-engine quorum would likely restore healthy customer trading quickly."
+        ],
+        "investigationTimeline": [
+          {
+            "order": 1,
+            "action": "Establish impact and the triggering infrastructure event.",
+            "outcome": "Investigators tied the start of customer impact to an AWS thermal event that affected zonal capacity."
+          },
+          {
+            "order": 2,
+            "action": "Diagnose matching-engine behavior and quorum loss.",
+            "outcome": "They identified quorum loss as the immediate mechanism blocking core exchange operations."
+          },
+          {
+            "order": 3,
+            "action": "Restore the minimum viable exchange state.",
+            "outcome": "Coinbase recovered quorum and reopened in constrained phases rather than full operation immediately."
+          },
+          {
+            "order": 4,
+            "action": "Trace downstream blockers that persisted after quorum restoration.",
+            "outcome": "The team found Kafka/MSK leader-election and fee-service dependencies were still preventing healthy trading."
+          },
+          {
+            "order": 5,
+            "action": "Sequence staged reopening and full recovery.",
+            "outcome": "The exchange moved through cancel-only and auction-style modes before normal trading resumed."
+          }
+        ],
+        "evidenceCollected": [
+          {
+            "sourceType": "rollout-change-history",
+            "detail": "Timeline correlation to AWS event",
+            "finding": "The outage aligned with an AWS thermal/facility event rather than a purely application-level bug."
+          },
+          {
+            "sourceType": "dependency-health-signal",
+            "detail": "Quorum and Kafka control-plane state",
+            "finding": "Matching-engine quorum loss and MSK leader-election issues both materially blocked recovery."
+          },
+          {
+            "sourceType": "time-correlated-telemetry",
+            "detail": "Customer-facing service availability and recovery stages",
+            "finding": "Customer surfaces remained impaired even after the first major internal subsystem was restored."
+          }
+        ],
+        "deadEnds": [
+          "Treating restored quorum as equivalent to restored customer experience would have ended the investigation too early."
+        ],
+        "keyTurningPoints": [
+          "Mapping the dependency chain beyond the matching engine exposed Kafka-related downstream blockers.",
+          "Staged reopening clarified that restoration sequencing was a separate problem from the initial failure."
+        ],
+        "rootCause": "A datacenter thermal event triggered zonal disruption that caused matching-engine quorum loss and exposed missing or insufficient automated cross-zone failover, while additional Kafka-related dependencies slowed recovery.",
+        "resolution": "Coinbase restored quorum, worked through downstream dependency issues, and reopened trading in phases until full service health returned.",
+        "lessonsLearned": [
+          "Recovery should be modeled separately from failure initiation.",
+          "Resilience assumptions must be tested against the actual failure mode, not the intended design.",
+          "Dependency chains should be reconstructed all the way to customer impact."
+        ]
+      },
+      "analystSynthesis": {
+        "effectiveTechniques": [
+          "End-to-end dependency-chain reconstruction.",
+          "Staged recovery to identify which subsystem still blocked customer outcomes.",
+          "Separating initial failure mechanics from restoration bottlenecks."
+        ],
+        "commonMistakes": [
+          "Assuming zonal architecture guarantees operational continuity.",
+          "Stopping diagnosis after the first major subsystem recovers."
+        ],
+        "incorrectAssumptions": [
+          "Managed or zonally redundant dependencies will perform their expected failover behavior under stress.",
+          "Recovery of the triggering subsystem implies recovery of user experience."
+        ],
+        "highValueEvidenceSources": [
+          "Quorum state and matching-engine health.",
+          "Kafka/MSK control-plane and leader-election behavior.",
+          "Staged trading-mode outcomes during recovery."
+        ],
+        "diagnosticShortcuts": [
+          "When a customer workflow is still broken after a core component recovers, trace the next dependency in the chain immediately."
+        ],
+        "antiPatterns": [
+          "Collapsing trigger, root cause, and recovery bottleneck into one explanation."
+        ],
+        "troubleshootingPrinciples": [
+          "The initiating event rarely explains the full duration of impact.",
+          "Recovery sequencing is diagnostic data, not just operational housekeeping."
+        ],
+        "skillIndicators": {
+          "beginner": [
+            "Attributes the outage to the facility event without mapping internal dependencies."
+          ],
+          "intermediate": [
+            "Identifies quorum loss and follows service restoration by phase."
+          ],
+          "advanced": [
+            "Uses dependency-chain reconstruction to explain why customer recovery lagged subsystem recovery."
+          ],
+          "expert": [
+            "Restores the minimum viable system in stages while continuing diagnosis of downstream blockers."
+          ]
+        },
+        "complexityScore": 8,
+        "complexityJustification": "The case spans physical infrastructure, distributed-system quorum, managed service behavior, and recovery orchestration under exchange-grade operational constraints."
+      },
+      "confidence": "high",
+      "caseOfWeekEligible": true
+    },
+    {
+      "id": "tc-2026-05-29-azure-openai-pir",
+      "slug": "azure-openai-multi-region-latency-and-failures-pir",
+      "status": "published",
+      "reviewStatus": "approved",
+      "title": "Microsoft Azure OpenAI multi-region latency and failures PIR",
+      "sourceTitle": "Post Incident Review (PIR) – Azure OpenAI Service – Latency and intermittent failures in multiple regions",
+      "sourceUrl": "https://azure.status.microsoft/en-us/status/history/",
+      "sourceType": "Vendor PIR",
+      "date": "2026-05-29",
+      "technologyArea": "AI & Automation",
+      "problemSummary": "Azure OpenAI experienced multi-region latency and failures after an upstream API change caused retry amplification from an internal Microsoft 365 workload. The investigation initially followed a credible but wrong crash signature before a second regional wave revealed the real mechanism.",
+      "sourceExtraction": {
+        "problemStatement": "Customers saw increased latency, intermittent failures, timeouts, and HTTP 5XX responses between 09:39 UTC and 17:05 UTC on May 29, 2026.",
+        "initialAssumptions": [
+          "Early crash signatures suggested an internal error-handling feature was causing instability.",
+          "Improvement after disabling that feature appeared to confirm the diagnosis."
+        ],
+        "investigationTimeline": [
+          {
+            "order": 1,
+            "action": "Detect falling success rates and correlate failures across regions and models.",
+            "outcome": "Azure established that the incident was broad and affected shared routing behavior."
+          },
+          {
+            "order": 2,
+            "action": "Inspect early crash diagnostics in the first impacted region, Australia East.",
+            "outcome": "Investigators formed a plausible theory around an internal feature tied to error handling."
+          },
+          {
+            "order": 3,
+            "action": "Disable the suspected feature.",
+            "outcome": "Service health improved as traffic also naturally declined, creating a false sense of confirmation."
+          },
+          {
+            "order": 4,
+            "action": "Observe recurrence when the upstream rollout expanded to Sweden Central.",
+            "outcome": "The same failure pattern reappeared at greater scale, invalidating the first explanation."
+          },
+          {
+            "order": 5,
+            "action": "Refocus on upstream retry behavior and isolate amplified traffic.",
+            "outcome": "The team identified retry amplification from an internal first-party workload, isolated it, and coordinated rollback of the triggering change."
+          }
+        ],
+        "evidenceCollected": [
+          {
+            "sourceType": "time-correlated-telemetry",
+            "detail": "Request success rates and latency",
+            "finding": "Automated monitoring showed a broad drop in request success and elevated latency across regions."
+          },
+          {
+            "sourceType": "cross-region-comparison",
+            "detail": "Australia East versus Sweden Central recurrence",
+            "finding": "The second wave in Sweden Central exposed the earlier mitigation as incomplete and highlighted the load-sensitive retry mechanism."
+          },
+          {
+            "sourceType": "dependency-health-signal",
+            "detail": "Inference routing layer resource exhaustion",
+            "finding": "Amplified internal retry traffic exhausted shared routing resources and caused out-of-memory crashes."
+          },
+          {
+            "sourceType": "rollout-change-history",
+            "detail": "Upstream API-layer rollout history",
+            "finding": "The trigger was an upstream change that altered how capacity failures surfaced to callers."
+          }
+        ],
+        "deadEnds": [
+          "Disabling the suspected internal feature addressed a secondary symptom and briefly looked like the fix."
+        ],
+        "keyTurningPoints": [
+          "The Sweden Central recurrence invalidated the first explanation.",
+          "Correlating the overload with upstream retry behavior separated the trigger from the misleading crash symptom.",
+          "Identifying the first-party workload origin clarified why shared infrastructure protections failed."
+        ],
+        "rootCause": "An upstream API-layer change caused capacity-related failures to surface as retriable server errors, creating a large retry storm from an internal Microsoft 365 workload that overwhelmed the shared Azure OpenAI routing layer.",
+        "resolution": "Azure isolated the offending workload onto dedicated infrastructure, coordinated rollback of the upstream change, reduced retry-driven traffic, and cleared backlogged requests.",
+        "lessonsLearned": [
+          "Symptom relief is not proof of diagnosis.",
+          "Retry storms must be treated as a first-class incident mechanism.",
+          "Recurrence under a different load profile can disprove an attractive theory quickly."
+        ]
+      },
+      "analystSynthesis": {
+        "effectiveTechniques": [
+          "Comparative analysis across regional waves.",
+          "Treating recurrence as diagnostic evidence instead of bad luck.",
+          "Separating secondary crash symptoms from the overload source."
+        ],
+        "commonMistakes": [
+          "Accepting early mitigation success as causal proof.",
+          "Underestimating retry amplification from internal callers."
+        ],
+        "incorrectAssumptions": [
+          "If a mitigation seems to work, the diagnosis is probably correct."
+        ],
+        "highValueEvidenceSources": [
+          "Regional success-rate telemetry.",
+          "Rollout and change history.",
+          "Shared routing layer resource-exhaustion signals."
+        ],
+        "diagnosticShortcuts": [
+          "When failures reappear under a new load profile, re-open the diagnosis immediately.",
+          "Put retry telemetry beside primary latency and error metrics during overload incidents."
+        ],
+        "antiPatterns": [
+          "Fixating on the first plausible crash signature without testing against recurrence."
+        ],
+        "troubleshootingPrinciples": [
+          "A convincing early theory is still provisional until it survives a second wave of evidence.",
+          "Trigger, amplifier, and visible failure path must be separated."
+        ],
+        "skillIndicators": {
+          "beginner": [
+            "Stops at the first crash signature and treats temporary improvement as closure."
+          ],
+          "intermediate": [
+            "Correlates multi-region impact and notices rollback timing."
+          ],
+          "advanced": [
+            "Uses recurrence and load-profile differences to invalidate the first theory."
+          ],
+          "expert": [
+            "Separates trigger, amplifier, and protection-gap, then executes containment on the offending workload."
+          ]
+        },
+        "complexityScore": 9,
+        "complexityJustification": "This case combines multi-region behavior, internal dependency contracts, retry amplification, shared multi-tenant infrastructure, and misleading symptom relief before the true cause became clear."
+      },
+      "confidence": "high",
+      "caseOfWeekEligible": true
+    },
+    {
+      "id": "tc-2026-05-29-azure-west-us-2-pir",
+      "slug": "azure-west-us-2-power-cooling-pir",
+      "status": "published",
+      "reviewStatus": "approved",
+      "title": "Microsoft Azure West US 2 power and cooling PIR",
+      "sourceTitle": "Post Incident Review (PIR) – Multiple services – Power/cooling issues in West US 2",
+      "sourceUrl": "https://azure.status.microsoft/en-us/status/history/",
+      "sourceType": "Vendor PIR",
+      "date": "2026-05-29",
+      "technologyArea": "Cloud Infrastructure",
+      "problemSummary": "A severe thunderstorm caused power disturbances across multiple datacenters in West US 2, triggering cooling lockouts and protective shutdowns across two physical availability zones. The hard part of the investigation was proving why recovery remained slow after cooling returned: storage validation and telemetry backlog had become the new bottlenecks.",
+      "sourceExtraction": {
+        "problemStatement": "Customers in West US 2 experienced failures to access or manage many Azure services between 04:24 UTC on May 29 and 02:30 UTC on May 30, 2026.",
+        "initialAssumptions": [
+          "Availability zones should contain most datacenter-scale failures.",
+          "Restoring cooling would likely end the majority of customer impact."
+        ],
+        "investigationTimeline": [
+          {
+            "order": 1,
+            "action": "Detect utility sag/swell events and thermal alerts across datacenters.",
+            "outcome": "Teams established that the initiating event was region-wide power instability rather than a single isolated datacenter fault."
+          },
+          {
+            "order": 2,
+            "action": "Diagnose cooling-system protective lockouts and begin manual restoration.",
+            "outcome": "Cooling was restored within roughly two hours, stabilizing temperatures."
+          },
+          {
+            "order": 3,
+            "action": "Assess the health of networking, compute, and storage systems after thermal stabilization.",
+            "outcome": "Compute recovered gradually, but storage and dependent systems lagged."
+          },
+          {
+            "order": 4,
+            "action": "Identify the remaining recovery bottleneck.",
+            "outcome": "Storage validation and related networking constraints became the dominant reason impact persisted."
+          },
+          {
+            "order": 5,
+            "action": "Work down telemetry and service backlog after core infrastructure recovery.",
+            "outcome": "Application Insights and Log Analytics required additional hours beyond primary infrastructure recovery."
+          }
+        ],
+        "evidenceCollected": [
+          {
+            "sourceType": "physical-infrastructure-signal",
+            "detail": "Utility sag/swell and cooling lockout observations",
+            "finding": "The incident began with widespread power instability that pushed cooling components into protective lockout."
+          },
+          {
+            "sourceType": "time-correlated-telemetry",
+            "detail": "Thermal alerts and staged recovery milestones",
+            "finding": "Cooling restored relatively early, but compute, storage, and telemetry recovered on very different timelines."
+          },
+          {
+            "sourceType": "dependency-health-signal",
+            "detail": "Storage validation and telemetry backlog",
+            "finding": "Sequential validation and backlog processing, not just cooling, dominated total outage duration."
+          }
+        ],
+        "deadEnds": [
+          "Assuming the restored cooling milestone meant the hard part of the incident was over."
+        ],
+        "keyTurningPoints": [
+          "Recognizing that two physical availability zones were affected broke the zone-containment assumption.",
+          "Declaring storage the remaining recovery bottleneck changed the response from incident initiation to recovery engineering."
+        ],
+        "rootCause": "A severe thunderstorm caused voltage instability across multiple West US 2 datacenters, which triggered cooling-system protective lockouts and consequent shutdowns of compute, network, and storage infrastructure across two physical availability zones.",
+        "resolution": "Azure restored cooling manually, then prioritized network, compute, storage validation, and finally telemetry backlog processing until remaining impacted services recovered.",
+        "lessonsLearned": [
+          "Recovery bottlenecks can outlast the triggering fault by many hours.",
+          "Availability-zone assumptions need to be tested against shared regional dependencies and physical failure behavior.",
+          "Manual recovery decision trees for physical systems must be explicit before the incident."
+        ]
+      },
+      "analystSynthesis": {
+        "effectiveTechniques": [
+          "Recovery sequencing by dependency criticality.",
+          "Treating physical infrastructure signals as first-class evidence.",
+          "Reframing the incident once storage became the dominant bottleneck."
+        ],
+        "commonMistakes": [
+          "Assuming logical availability-zone design cleanly maps to physical blast radius.",
+          "Treating the initiating physical event as the only meaningful diagnostic problem."
+        ],
+        "incorrectAssumptions": [
+          "Availability zones localize most large failures.",
+          "The event that breaks the system also explains recovery duration."
+        ],
+        "highValueEvidenceSources": [
+          "Power and cooling telemetry.",
+          "Recovery timeline by subsystem.",
+          "Storage validation and backlog status."
+        ],
+        "diagnosticShortcuts": [
+          "After the initiating fault is mitigated, ask which dependency still gates safe restoration."
+        ],
+        "antiPatterns": [
+          "Reporting recovery based on one restored subsystem while downstream validation remains unresolved."
+        ],
+        "troubleshootingPrinciples": [
+          "Recovery is a separate troubleshooting problem from failure initiation.",
+          "Physical incidents become software incidents once shared control planes and storage paths are involved."
+        ],
+        "skillIndicators": {
+          "beginner": [
+            "Stops at the thunderstorm and cooling story without explaining why impact lasted so long."
+          ],
+          "intermediate": [
+            "Tracks cooling, compute, storage, and telemetry as separate stages."
+          ],
+          "advanced": [
+            "Reframes the incident around the new recovery bottleneck once the trigger is contained."
+          ],
+          "expert": [
+            "Explains why physical blast radius, shared dependencies, and validation order matter more than nominal zone design."
+          ]
+        },
+        "complexityScore": 8,
+        "complexityJustification": "The case crosses physical infrastructure, regional platform design, and long-tail recovery sequencing, with ambiguity shifting from cause discovery to restoration bottlenecks."
+      },
+      "confidence": "high",
+      "caseOfWeekEligible": true
+    },
+    {
+      "id": "tc-2026-06-11-gemini-outage-analysis",
+      "slug": "google-gemini-june-10-2026-outage-analysis",
+      "status": "published",
+      "reviewStatus": "approved",
+      "title": "Google Gemini outage analysis",
+      "sourceTitle": "Google Gemini Outage Analysis: June 10, 2026",
+      "sourceUrl": "https://www.thousandeyes.com/blog/google-gemini-outage-analysis-june-10-2026",
+      "sourceType": "External outage analysis",
+      "date": "2026-06-11",
+      "technologyArea": "AI & Automation",
+      "problemSummary": "ThousandEyes analyzed a Gemini degradation where the chatbot failed to reply to some users. The high-value move was proving that frontend network reachability remained healthy, which bounded the issue to backend service behavior before Google’s own attribution landed.",
+      "sourceExtraction": {
+        "problemStatement": "Beginning around 10:10 UTC on June 10, 2026, users experienced Gemini failures to reply, with service recovering and then degrading again later the same day.",
+        "initialAssumptions": [
+          "A global user-visible outage could plausibly be a network or reachability problem."
+        ],
+        "investigationTimeline": [
+          {
+            "order": 1,
+            "action": "Measure frontend reachability, latency, and packet loss toward Gemini.",
+            "outcome": "ThousandEyes found no packet loss, elevated latency, or reachability issues toward frontend infrastructure."
+          },
+          {
+            "order": 2,
+            "action": "Track service degradation and partial recovery over time.",
+            "outcome": "The analysis showed an initial impact window, a recovery around 17:25 UTC, and a second degradation around 21:15 UTC."
+          },
+          {
+            "order": 3,
+            "action": "Constrain likely fault domain based on negative evidence.",
+            "outcome": "Investigators concluded the disruption was likely backend-related rather than a frontend network path problem."
+          }
+        ],
+        "evidenceCollected": [
+          {
+            "sourceType": "external-observation",
+            "detail": "Global ThousandEyes observations",
+            "finding": "Independent measurements showed the issue from multiple vantage points without corresponding network transport failure."
+          },
+          {
+            "sourceType": "time-correlated-telemetry",
+            "detail": "Reachability, latency, and observed degradation windows",
+            "finding": "Application-level failures rose while basic network indicators stayed normal."
+          }
+        ],
+        "deadEnds": [
+          "A network-first diagnosis would have wasted time because transport symptoms did not support it."
+        ],
+        "keyTurningPoints": [
+          "Negative network evidence quickly ruled out one major class of explanations."
+        ],
+        "rootCause": "Google later attributed the incident to a database performance issue affecting Gemini backend behavior.",
+        "resolution": "Service returned to baseline after the backend issue was addressed, following an initial recovery and later recurrence.",
+        "lessonsLearned": [
+          "Healthy network reachability is meaningful evidence, not absence of evidence.",
+          "External observers can narrow the search space quickly even without full internal telemetry."
+        ]
+      },
+      "analystSynthesis": {
+        "effectiveTechniques": [
+          "Fault-domain bounding through negative network evidence.",
+          "Using independent external observation to constrain the search space."
+        ],
+        "commonMistakes": [
+          "Assuming a user-visible outage is probably a network outage."
+        ],
+        "incorrectAssumptions": [
+          "If the network path looks healthy, the service probably is too."
+        ],
+        "highValueEvidenceSources": [
+          "Packet-loss, latency, and reachability measurements from external vantage points."
+        ],
+        "diagnosticShortcuts": [
+          "Check whether frontend network health contradicts the user-visible symptom before opening a broad war room across all layers."
+        ],
+        "antiPatterns": [
+          "Treating the absence of network failure as uninteresting."
+        ],
+        "troubleshootingPrinciples": [
+          "Proving a healthy layer early can cut the problem space sharply."
+        ],
+        "skillIndicators": {
+          "beginner": [
+            "Generalizes from user-visible errors to a network diagnosis with no supporting evidence."
+          ],
+          "intermediate": [
+            "Uses basic reachability checks to rule out transport failure."
+          ],
+          "advanced": [
+            "Treats negative evidence as a strong input into fault-domain reduction."
+          ],
+          "expert": [
+            "Uses independent measurement to bound the issue before internal RCA is available."
+          ]
+        },
+        "complexityScore": 5,
+        "complexityJustification": "The external analysis was intentionally narrow and did not expose the full internal debugging story, but it demonstrated a high-value investigative shortcut with moderate ambiguity."
+      },
+      "confidence": "medium",
+      "caseOfWeekEligible": true
+    },
+    {
+      "id": "tc-2026-06-12-meta-outage-analysis",
+      "slug": "meta-june-12-2026-outage-analysis",
+      "status": "published",
+      "reviewStatus": "approved",
+      "title": "Meta outage analysis",
+      "sourceTitle": "Meta Outage Analysis: June 12, 2026",
+      "sourceUrl": "https://www.thousandeyes.com/blog/meta-outage-analysis-june-12-2026",
+      "sourceType": "External outage analysis",
+      "date": "2026-06-12",
+      "technologyArea": "Applications",
+      "problemSummary": "ThousandEyes examined a broad Meta outage affecting Facebook, Messenger, WhatsApp, and later Instagram. The most valuable reasoning move was showing that frontend network reachability remained normal while application errors and timeouts rose, which excluded one major fault domain immediately.",
+      "sourceExtraction": {
+        "problemStatement": "Beginning around 13:40 UTC on June 12, 2026, multiple Meta services showed response errors and timeouts for users globally until availability returned near baseline around 15:30 UTC.",
+        "initialAssumptions": [
+          "A simultaneous outage across multiple Meta services could reasonably be suspected to involve network transport or Internet path issues."
+        ],
+        "investigationTimeline": [
+          {
+            "order": 1,
+            "action": "Observe response errors and timeouts across Meta services from global vantage points.",
+            "outcome": "Investigators confirmed a broad user-visible degradation across multiple applications."
+          },
+          {
+            "order": 2,
+            "action": "Measure frontend reachability and path health toward Meta infrastructure.",
+            "outcome": "Packet loss and latency remained normal, showing that reachability was intact."
+          },
+          {
+            "order": 3,
+            "action": "Constrain the likely problem layer using the healthy transport signals.",
+            "outcome": "The evidence pointed away from front-end network failure and toward application or backend service trouble."
+          }
+        ],
+        "evidenceCollected": [
+          {
+            "sourceType": "external-observation",
+            "detail": "Global ThousandEyes service observations",
+            "finding": "Independent vantage points saw errors and timeouts across multiple Meta applications."
+          },
+          {
+            "sourceType": "time-correlated-telemetry",
+            "detail": "Packet loss and latency measurements",
+            "finding": "Transport metrics stayed normal while application failures rose."
+          }
+        ],
+        "deadEnds": [
+          "Assuming a broad consumer outage implies Internet reachability problems would have mis-scoped the incident."
+        ],
+        "keyTurningPoints": [
+          "Healthy front-end path measurements sharply reduced the candidate fault domain."
+        ],
+        "rootCause": "The external analysis did not provide an internal root-cause statement, but it strongly indicated the issue was not front-end network reachability.",
+        "resolution": "Service availability returned near baseline by approximately 15:30 UTC as the underlying Meta-side service issue was mitigated.",
+        "lessonsLearned": [
+          "External network measurements can decisively exclude one major layer of the stack.",
+          "Outage breadth does not automatically imply transport-layer failure."
+        ]
+      },
+      "analystSynthesis": {
+        "effectiveTechniques": [
+          "Comparative analysis between application errors and transport health.",
+          "Rapid fault-domain reduction using independent external data."
+        ],
+        "commonMistakes": [
+          "Over-attributing large consumer outages to network path issues."
+        ],
+        "incorrectAssumptions": [
+          "If many apps fail at once, the network path is probably broken."
+        ],
+        "highValueEvidenceSources": [
+          "Global vantage-point observations.",
+          "Packet-loss and latency measurements toward the frontend edge."
+        ],
+        "diagnosticShortcuts": [
+          "When multiple apps fail simultaneously, check whether path health contradicts the outage narrative before escalating to network-first investigation."
+        ],
+        "antiPatterns": [
+          "Letting outage scope substitute for evidence about the failing layer."
+        ],
+        "troubleshootingPrinciples": [
+          "Breadth of impact does not identify the faulty layer.",
+          "Healthy transport is a meaningful exclusion signal."
+        ],
+        "skillIndicators": {
+          "beginner": [
+            "Equates large blast radius with transport failure."
+          ],
+          "intermediate": [
+            "Checks edge reachability alongside application errors."
+          ],
+          "advanced": [
+            "Uses healthy transport telemetry to bound the remaining investigation space."
+          ],
+          "expert": [
+            "Treats external observability as a first-class early triage input when internal data is unavailable."
+          ]
+        },
+        "complexityScore": 5,
+        "complexityJustification": "The external analysis intentionally focused on bounding the fault domain rather than full root-cause discovery, so the case is moderate in ambiguity but limited in internal depth."
+      },
+      "confidence": "medium",
+      "caseOfWeekEligible": true
+    }
+  ],
+  "troubleshootingInsights": [
+    {
+      "id": "ti-2026-06-20-symptom-relief-not-proof",
+      "slug": "symptom-relief-is-not-proof-of-diagnosis",
+      "status": "published",
+      "reviewStatus": "approved",
+      "title": "Symptom relief is not proof of diagnosis",
+      "patternDiscovered": "Apparent improvement after a mitigation can mask an incorrect theory when traffic, load, or other conditions change at the same time.",
+      "summary": "Across the review window, experienced investigators treated early improvement as provisional. They kept testing whether the suspected fix actually removed the causal mechanism or whether the system simply became less stressed for another reason.",
+      "supportingEvidence": [
+        "Azure OpenAI improved after a suspected internal feature was disabled, but later evidence showed the main mechanism was upstream retry amplification.",
+        "Coinbase restored matching-engine quorum before customer experience recovered because downstream Kafka-related blockers still remained."
+      ],
+      "supportingCaseCount": 3,
+      "supportingCases": [
+        "Microsoft Azure OpenAI multi-region latency and failures PIR",
+        "Coinbase May 7, 2026 outage postmortem",
+        "Microsoft Azure West US 2 power and cooling PIR"
+      ],
+      "practicalTakeaway": "Do not mark a diagnosis confirmed just because one mitigation coincides with improvement. Look for disconfirming evidence and re-test the theory under a different load or region profile.",
+      "sourceReportTitle": "Troubleshooting Intelligence Weekly",
+      "sourceReportPath": "docs/reports/2026-06-20-troubleshooting-intelligence-weekly.md",
+      "reviewWindowStart": "2026-05-21T00:00:00.000Z",
+      "reviewWindowEnd": "2026-06-20T23:59:59.999Z",
+      "sourceUrls": [
+        "https://azure.status.microsoft/en-us/status/history/",
+        "https://www.coinbase.com/blog/a-postmortem-of-our-may-7-2026-outage"
+      ],
+      "tags": [
+        "diagnosis",
+        "false-positive-mitigation",
+        "causal-validation",
+        "recovery-analysis"
+      ],
+      "supportingCaseIds": [
+        "tc-2026-05-29-azure-openai-pir",
+        "tc-2026-06-01-coinbase-may-7-outage",
+        "tc-2026-05-29-azure-west-us-2-pir"
+      ]
+    },
+    {
+      "id": "ti-2026-06-20-prove-healthy-layer",
+      "slug": "prove-what-layer-is-still-healthy-first",
+      "status": "published",
+      "reviewStatus": "approved",
+      "title": "The fastest way to narrow an outage is to prove what layer is still healthy",
+      "patternDiscovered": "Strong investigators shrink the search space early by proving healthy layers with comparative evidence instead of staring only at the failing symptom.",
+      "summary": "The highest-leverage early move across the cases was exclusion. Teams and external observers established which paths, caches, or transport layers were behaving normally, which immediately bounded the fault domain.",
+      "supportingEvidence": [
+        "ThousandEyes ruled out front-end network transport as the primary cause in both the Meta and Google Gemini incidents because network path metrics stayed normal while application failures rose.",
+        "Cloudflare separated cache-served success from fresh-resolution failure during the .de DNSSEC incident."
+      ],
+      "supportingCaseCount": 3,
+      "supportingCases": [
+        "Meta outage analysis",
+        "Google Gemini outage analysis",
+        "Cloudflare .de DNSSEC outage response"
+      ],
+      "practicalTakeaway": "Spend early incident time proving what is healthy. Clean paths, healthy caches, and unaffected regions are not side notes; they are search-space reducers.",
+      "sourceReportTitle": "Troubleshooting Intelligence Weekly",
+      "sourceReportPath": "docs/reports/2026-06-20-troubleshooting-intelligence-weekly.md",
+      "reviewWindowStart": "2026-05-21T00:00:00.000Z",
+      "reviewWindowEnd": "2026-06-20T23:59:59.999Z",
+      "sourceUrls": [
+        "https://www.thousandeyes.com/blog/meta-outage-analysis-june-12-2026",
+        "https://www.thousandeyes.com/blog/google-gemini-outage-analysis-june-10-2026",
+        "https://blog.cloudflare.com/de-tld-outage-dnssec/"
+      ],
+      "tags": [
+        "fault-domain",
+        "comparative-evidence",
+        "layer-isolation",
+        "network-vs-application"
+      ],
+      "supportingCaseIds": [
+        "tc-2026-06-12-meta-outage-analysis",
+        "tc-2026-06-11-gemini-outage-analysis",
+        "tc-2026-05-06-cloudflare-de-dnssec"
+      ]
+    },
+    {
+      "id": "ti-2026-06-20-retry-storm-branch",
+      "slug": "retry-storms-deserve-their-own-incident-branch",
+      "status": "published",
+      "reviewStatus": "approved",
+      "title": "Retry storms deserve their own branch in every incident tree",
+      "patternDiscovered": "Retry behavior is often an amplifier that becomes part of the incident mechanism, not just a background implementation detail.",
+      "summary": "The reviewed cases show that overload analysis is incomplete unless it explicitly measures who retried, how often, and under what translation of failures. Retry amplification can outgrow the initiating fault and dominate the operational picture.",
+      "supportingEvidence": [
+        "Azure OpenAI identified retry amplification as the mechanism that multiplied failed requests into much larger load.",
+        "Cloudflare observed retry-driven query inflation during the .de outage."
+      ],
+      "supportingCaseCount": 3,
+      "supportingCases": [
+        "Microsoft Azure OpenAI multi-region latency and failures PIR",
+        "Cloudflare .de DNSSEC outage response",
+        "Microsoft Azure West US 2 power and cooling PIR"
+      ],
+      "practicalTakeaway": "Put retry telemetry on the first diagnostic dashboard. Ask who is retrying, what backoff exists, and which error classes trigger new demand.",
+      "sourceReportTitle": "Troubleshooting Intelligence Weekly",
+      "sourceReportPath": "docs/reports/2026-06-20-troubleshooting-intelligence-weekly.md",
+      "reviewWindowStart": "2026-05-21T00:00:00.000Z",
+      "reviewWindowEnd": "2026-06-20T23:59:59.999Z",
+      "sourceUrls": [
+        "https://azure.status.microsoft/en-us/status/history/",
+        "https://blog.cloudflare.com/de-tld-outage-dnssec/"
+      ],
+      "tags": [
+        "retry-storms",
+        "amplification",
+        "load-analysis",
+        "resilience-assumptions"
+      ],
+      "supportingCaseIds": [
+        "tc-2026-05-29-azure-openai-pir",
+        "tc-2026-05-06-cloudflare-de-dnssec",
+        "tc-2026-05-29-azure-west-us-2-pir"
+      ]
+    },
+    {
+      "id": "ti-2026-06-20-recovery-separate-problem",
+      "slug": "recovery-is-a-separate-troubleshooting-problem",
+      "status": "published",
+      "reviewStatus": "approved",
+      "title": "Recovery should be investigated as a separate problem from failure",
+      "patternDiscovered": "The event that breaks a system is often not the same factor that makes restoration slow, unsafe, or incomplete.",
+      "summary": "Across the cases, strong investigators treated restoration as its own diagnostic branch. They separated the initiating fault from the dependencies, backlog, and validation work that governed safe recovery.",
+      "supportingEvidence": [
+        "Azure West US 2 restored cooling before storage validation and telemetry backlog were cleared.",
+        "Coinbase restored matching-engine quorum hours before the exchange could fully reopen because Kafka-related downstream systems were still blocked."
+      ],
+      "supportingCaseCount": 2,
+      "supportingCases": [
+        "Microsoft Azure West US 2 power and cooling PIR",
+        "Coinbase May 7, 2026 outage postmortem"
+      ],
+      "practicalTakeaway": "Run two mental models in parallel: what caused the failure, and what is still preventing safe restoration.",
+      "sourceReportTitle": "Troubleshooting Intelligence Weekly",
+      "sourceReportPath": "docs/reports/2026-06-20-troubleshooting-intelligence-weekly.md",
+      "reviewWindowStart": "2026-05-21T00:00:00.000Z",
+      "reviewWindowEnd": "2026-06-20T23:59:59.999Z",
+      "sourceUrls": [
+        "https://azure.status.microsoft/en-us/status/history/",
+        "https://www.coinbase.com/blog/a-postmortem-of-our-may-7-2026-outage"
+      ],
+      "tags": [
+        "recovery",
+        "restoration-sequencing",
+        "dependency-analysis",
+        "backlog"
+      ],
+      "supportingCaseIds": [
+        "tc-2026-05-29-azure-west-us-2-pir",
+        "tc-2026-06-01-coinbase-may-7-outage"
+      ]
+    },
+    {
+      "id": "ti-2026-06-20-exception-policies",
+      "slug": "shared-infrastructure-rewards-known-exception-policies",
+      "status": "published",
+      "reviewStatus": "approved",
+      "title": "Shared infrastructure incidents reward teams that already know their exception policies",
+      "patternDiscovered": "When a shared system fails, recovery moves faster when operators already know which emergency exceptions, bypasses, or isolation moves are acceptable.",
+      "summary": "The cases show that technically difficult incidents become governance problems as well. Teams that know their emergency options ahead of time can choose containment moves faster and with less confusion.",
+      "supportingEvidence": [
+        "Cloudflare had to weigh strict DNSSEC validation against temporary service restoration with an NTA-equivalent override.",
+        "Azure OpenAI had to isolate a large internal workload from shared multi-tenant infrastructure to stop collateral damage."
+      ],
+      "supportingCaseCount": 3,
+      "supportingCases": [
+        "Cloudflare .de DNSSEC outage response",
+        "Microsoft Azure OpenAI multi-region latency and failures PIR",
+        "Microsoft Azure West US 2 power and cooling PIR"
+      ],
+      "practicalTakeaway": "Predefine emergency exception moves for shared systems: isolation, bypass, degradation, and temporary trust-model adjustments.",
+      "sourceReportTitle": "Troubleshooting Intelligence Weekly",
+      "sourceReportPath": "docs/reports/2026-06-20-troubleshooting-intelligence-weekly.md",
+      "reviewWindowStart": "2026-05-21T00:00:00.000Z",
+      "reviewWindowEnd": "2026-06-20T23:59:59.999Z",
+      "sourceUrls": [
+        "https://blog.cloudflare.com/de-tld-outage-dnssec/",
+        "https://azure.status.microsoft/en-us/status/history/"
+      ],
+      "tags": [
+        "shared-infrastructure",
+        "exception-policy",
+        "incident-governance",
+        "containment"
+      ],
+      "supportingCaseIds": [
+        "tc-2026-05-06-cloudflare-de-dnssec",
+        "tc-2026-05-29-azure-openai-pir",
+        "tc-2026-05-29-azure-west-us-2-pir"
+      ]
+    }
+  ],
+  "projects": []
+}

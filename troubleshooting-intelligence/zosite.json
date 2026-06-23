@@ -1,0 +1,15 @@
+{
+  "name": "troubleshooting-intelligence",
+  "local_port": 54366,
+  "entrypoint": "bun run dev",
+  "publish": {
+    "label": "troubleshooting-intelligence",
+    "type": "http",
+    "entrypoint": "bun run prod",
+    "published_port": 55176,
+    "env": {
+      "NODE_ENV": "production",
+      "ZO_CLIENT_IDENTITY_TOKEN": "none"
+    }
+  }
+}

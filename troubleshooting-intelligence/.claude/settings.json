@@ -1,0 +1,22 @@
+{
+  "defaultMode": "bypassPermissions",
+  "apiKeyHelper": "echo $ZO_CLIENT_IDENTITY_TOKEN",
+  "permissions": {
+    "allow": [
+      "Bash(rm:*)",
+      "Bash(mkdir:*)",
+      "Bash(mv:*)",
+      "Bash(bun:*)",
+      "Bash(git:*)",
+      "Bash(chmod:*)",
+      "Bash(grep:*)",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(curl:*)",
+      "Edit",
+      "Write",
+      "MultiEdit"
+    ]
+  },
+  "model": "claude-sonnet-4-5-20250929"
+}

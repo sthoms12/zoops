@@ -1,0 +1,10 @@
+*
+!/.gitignore
+!/About.md
+!/Skills/
+!/solvestack/
+!/solvestack/**
+!/troubleshooting-intelligence/
+!/troubleshooting-intelligence/**
+!/zoops/
+!/zoops/**
