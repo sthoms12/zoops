@@ -4,8 +4,6 @@ A management dashboard for [Zo Computer](https://zo.computer) — built by a Zo 
 
 Track your workflows, services, browser tasks, prompts, skills, and system health without needing AI to be running.
 
-![ZoOps Command Center](https://thomstech.zo.computer/zoops-preview.png)
-
 ---
 
 ## What it does
@@ -47,7 +45,7 @@ ZoOps is a Zo-native ops plane. It gives you a persistent, visual record of ever
 ```bash
 # Clone into your Zo workspace
 cd /home/workspace
-git clone https://github.com/zocomputer/zoops.git
+git clone https://github.com/sthoms12/zoops.git
 cd zoops
 
 # Install dependencies
@@ -98,8 +96,10 @@ The `AGENTS.md` file in this repo is a Claude Code agent guide. When Claude Code
 
 ---
 
-## Contributing
+## License
 
-This is an early-stage internal tool. Issues and PRs welcome.
+MIT — free to use, modify, and share.
 
-Built with [Zo Computer](https://zo.computer).
+---
+
+Built by [@thomstech](https://github.com/sthoms12) with [Zo Computer](https://zo.computer).
