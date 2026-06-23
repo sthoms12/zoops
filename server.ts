@@ -5,6 +5,7 @@ import { db, initDb, generateId, now } from "./backend-lib/db";
 import { runDiscovery, persistDiscovery, detectServicesFromLogs } from "./backend-lib/discovery";
 import { runHealthCheck } from "./backend-lib/health";
 import { seedIfEmpty } from "./backend-lib/seed";
+import { readdirSync, existsSync } from "fs";
 
 type Mode = "development" | "production";
 const mode: Mode = process.env.NODE_ENV === "production" ? "production" : "development";
@@ -94,9 +95,20 @@ app.get("/api/discovery", c => {
 
 app.post("/api/discovery/scan", async c => {
   try {
+    const previous = db.prepare("SELECT type, name, path FROM discovered_items").all() as any[];
+    const prevPaths = new Set(previous.map((i: any) => i.path));
     const items = runDiscovery();
+    const newPaths = new Set(items.map(i => i.path));
+    const added = items.filter(i => !prevPaths.has(i.path)).map(i => ({ type: i.type, name: i.name, path: i.path }));
+    const removed = previous.filter((i: any) => !newPaths.has(i.path)).map((i: any) => ({ type: i.type, name: i.name, path: i.path }));
     persistDiscovery(items);
-    return c.json({ count: items.length, items: items.slice(0, 5) });
+    if (previous.length > 0) {
+      db.prepare(`INSERT INTO scan_deltas (id,scan_at,total_count,added_count,removed_count,items_added,items_removed)
+        VALUES (?,datetime('now'),?,?,?,?,?)`)
+        .run(generateId(), items.length, added.length, removed.length,
+          JSON.stringify(added.slice(0, 50)), JSON.stringify(removed.slice(0, 50)));
+    }
+    return c.json({ count: items.length, added: added.length, removed: removed.length, items: items.slice(0, 5) });
   } catch (e: any) {
     return c.json({ error: e.message }, 500);
   }
@@ -424,6 +436,110 @@ app.get("/api/events", c => {
   params.push(Math.min(limit, 500));
   const events = db.prepare(query).all(...params);
   return c.json(events);
+});
+
+// ── CHANGELOG (scan deltas) ──────────────────────────────────────
+app.get("/api/changelog", c => {
+  const rows = db.prepare("SELECT * FROM scan_deltas ORDER BY scan_at DESC LIMIT 50").all() as any[];
+  return c.json(rows.map(r => ({
+    ...r,
+    items_added: JSON.parse(r.items_added || "[]"),
+    items_removed: JSON.parse(r.items_removed || "[]"),
+  })));
+});
+
+// ── FEED (intelligence output) ────────────────────────────────────
+app.get("/api/feed", c => {
+  const { limit = "50", workflowId, search } = c.req.query();
+  let query = "SELECT * FROM workflow_runs WHERE output IS NOT NULL AND output != ''";
+  const params: any[] = [];
+  if (workflowId) { query += " AND workflow_id=?"; params.push(workflowId); }
+  if (search) {
+    query += " AND (output LIKE ? OR workflow_name LIKE ? OR summary LIKE ?)";
+    const s = `%${search}%`; params.push(s, s, s);
+  }
+  query += " ORDER BY created_at DESC LIMIT ?";
+  params.push(Math.min(parseInt(limit), 200));
+  const runs = db.prepare(query).all(...params) as any[];
+  const workflows = db.prepare(
+    "SELECT DISTINCT workflow_id, workflow_name FROM workflow_runs WHERE output IS NOT NULL AND output != '' ORDER BY workflow_name"
+  ).all() as any[];
+  return c.json({ runs, workflows });
+});
+
+// ── LOGS ──────────────────────────────────────────────────────────
+app.get("/api/logs/list", c => {
+  try {
+    const files = readdirSync("/dev/shm")
+      .filter(f => f.endsWith(".log"))
+      .sort()
+      .map(f => ({ name: f.replace(".log", ""), file: f }));
+    return c.json(files);
+  } catch {
+    return c.json([]);
+  }
+});
+
+app.get("/api/logs/:name", async c => {
+  const raw = c.req.param("name");
+  const safeName = raw.replace(/[^a-zA-Z0-9._-]/g, "");
+  const lines = Math.min(parseInt(c.req.query("lines") ?? "300"), 1000);
+  const path = `/dev/shm/${safeName}.log`;
+  if (!existsSync(path)) return c.json({ lines: [], error: "Log file not found" });
+  try {
+    const content = await Bun.file(path).text();
+    const all = content.split("\n").filter(Boolean);
+    const tail = all.slice(-lines);
+    return c.json({ lines: tail, total: all.length });
+  } catch (e: any) {
+    return c.json({ lines: [], error: e.message });
+  }
+});
+
+// ── EXPLORER (SQLite) ─────────────────────────────────────────────
+app.get("/api/explorer/databases", c => {
+  const dbs = db.prepare(
+    "SELECT name, path, description, metadata FROM discovered_items WHERE type='database' ORDER BY name"
+  ).all() as any[];
+  return c.json(dbs.map(d => ({ ...d, metadata: JSON.parse(d.metadata || "{}") })));
+});
+
+app.post("/api/explorer/tables", async c => {
+  const { dbPath } = await c.req.json();
+  if (!dbPath || !/^\/home\/workspace\/.+\.(db|sqlite|sqlite3)$/.test(dbPath)) {
+    return c.json({ error: "Invalid database path" }, 400);
+  }
+  if (!existsSync(dbPath)) return c.json({ error: "File not found" }, 404);
+  try {
+    const { Database } = await import("bun:sqlite");
+    const target = new Database(dbPath, { readonly: true });
+    const tables = (target.prepare("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name").all() as any[]).map(t => t.name);
+    target.close();
+    return c.json({ tables });
+  } catch (e: any) {
+    return c.json({ error: e.message }, 400);
+  }
+});
+
+app.post("/api/explorer/query", async c => {
+  const { dbPath, query: sql } = await c.req.json();
+  if (!dbPath || !/^\/home\/workspace\/.+\.(db|sqlite|sqlite3)$/.test(dbPath)) {
+    return c.json({ error: "Invalid database path" }, 400);
+  }
+  const trimmed = (sql || "").trim().toUpperCase();
+  if (!trimmed.startsWith("SELECT") && !trimmed.startsWith("PRAGMA")) {
+    return c.json({ error: "Only SELECT and PRAGMA queries are allowed" }, 400);
+  }
+  if (!existsSync(dbPath)) return c.json({ error: "File not found" }, 404);
+  try {
+    const { Database } = await import("bun:sqlite");
+    const target = new Database(dbPath, { readonly: true });
+    const rows = (target.prepare(sql).all() as any[]).slice(0, 500);
+    target.close();
+    return c.json({ rows, count: rows.length });
+  } catch (e: any) {
+    return c.json({ error: e.message }, 400);
+  }
 });
 
 // ── VITE / STATIC ─────────────────────────────────────────────────

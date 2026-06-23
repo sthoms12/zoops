@@ -137,6 +137,16 @@ export function initDb() {
     created_at TEXT DEFAULT (datetime('now'))
   )`);
 
+  db.run(`CREATE TABLE IF NOT EXISTS scan_deltas (
+    id TEXT PRIMARY KEY,
+    scan_at TEXT DEFAULT (datetime('now')),
+    total_count INTEGER DEFAULT 0,
+    added_count INTEGER DEFAULT 0,
+    removed_count INTEGER DEFAULT 0,
+    items_added TEXT DEFAULT '[]',
+    items_removed TEXT DEFAULT '[]'
+  )`);
+
   // Keep event log from growing unboundedly — prune on startup
   db.run("DELETE FROM app_events WHERE timestamp < datetime('now', '-30 days')");
 }

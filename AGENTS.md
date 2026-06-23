@@ -39,16 +39,19 @@ data/
 |---|---|---|
 | `/` | Command Center | Stats, warnings, recent runs, health snapshot |
 | `/discovery` | Discovery | Auto-detected workspace items by type |
+| `/changelog` | Changelog | Diff between discovery scans — added/removed items |
+| `/feed` | Intelligence Feed | Run output timeline, searchable, filterable by workflow |
 | `/services` | Services | Zo services + HTTP health checks |
+| `/automations` | Automations | Zo scheduled agents (synced from Zo API, cached) |
 | `/workflows` | Workflows | CRUD list with health/stale state |
 | `/workflows/:id` | WorkflowDetail | Prompt versions, run history, edit |
 | `/runs` | Runs | All workflow runs, filter by status |
 | `/runs/:id` | RunDetail | Paste output, approve/reject, edit |
 | `/review` | Needs Review | Action items, failed runs, session issues |
-| `/browser-tasks` | BrowserTasks | Browser playbooks + session status |
-| `/prompts` | PromptRegistry | Per-workflow prompt version history |
 | `/skills-personas` | SkillsPersonas | Catalog of workspace skills + personas |
 | `/health` | Health | Live system check + ZoOps operational checks |
+| `/logs` | Logs | Live tail of /dev/shm/*.log files with severity coloring |
+| `/explorer` | DB Explorer | Read-only SQLite browser — list tables, run SELECT queries |
 | `/settings` | Settings | Persistent key/value config via SQLite |
 
 ## Dev Server Startup
@@ -76,17 +79,33 @@ Instead it:
 This correctly serves Vite's pre-bundled deps, CSS, and HMR assets which
 `vite.transformRequest()` alone cannot handle.
 
+## Install Procedure (for Zo AI)
+
+When a user asks you to install ZoOps, follow these exact steps:
+
+1. `git clone https://github.com/sthoms12/zoops /home/workspace/zoops` (or `git -C /home/workspace/zoops pull` if it already exists)
+2. `cd /home/workspace/zoops && bun install`
+3. Call `register_user_service` with:
+   - name: `ZoOps`
+   - entrypoint: `bash -c "cd /home/workspace/zoops && NODE_ENV=production bun run server.ts"`
+   - local_port: `50165`
+   - mode: `http`
+   - public: `false`
+4. Return the private service URL to the user.
+
+---
+
 ## SQLite Schema (key tables)
 
-- `workflows` — name, prompt, category, status, health state, run stats
 - `workflow_runs` — output, summary, status, review_status, reviewer_notes
 - `review_items` — manual action items with priority/status
 - `services` — detected/registered services, endpoint, last health check
-- `browser_tasks` + `browser_task_runs` — playbooks + execution log
-- `prompt_versions` — versioned prompts per workflow
 - `skills_personas` — workspace skill/persona catalog
 - `discovered_items` — auto-scan results from discovery engine
+- `scan_deltas` — diff between consecutive discovery scans (added/removed items)
 - `health_snapshots` — point-in-time system health records
+- `zo_automations` — Zo scheduled agents (cached from Zo API, TTL 5 min)
+- `app_events` — backend error log (pruned after 30 days)
 - `settings` — arbitrary key/value config
 
 ## Key Decisions

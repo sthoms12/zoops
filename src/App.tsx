@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import {
   LayoutDashboard, Search, Server, Play, Inbox,
   Brain, Activity, Settings as SettingsIcon, Zap, Menu, X,
+  Rss, Terminal, Database, GitCompare,
 } from "lucide-react";
 import { Toaster } from "sonner";
 import { cn } from "@/lib/utils";
@@ -18,6 +19,10 @@ import SkillsPersonas from "@/pages/SkillsPersonas";
 import HealthPage from "@/pages/Health";
 import SettingsPage from "@/pages/Settings";
 import AutomationsPage from "@/pages/Automations";
+import FeedPage from "@/pages/Feed";
+import LogsPage from "@/pages/Logs";
+import ExplorerPage from "@/pages/Explorer";
+import ChangelogPage from "@/pages/Changelog";
 
 type NavGroup = {
   label: string;
@@ -38,11 +43,13 @@ const navGroups: NavGroup[] = [
     items: [
       { to: "/", icon: <LayoutDashboard size={15} />, label: "Command Center", exact: true },
       { to: "/discovery", icon: <Search size={15} />, label: "Discovery" },
+      { to: "/changelog", icon: <GitCompare size={15} />, label: "Workspace Changelog" },
     ],
   },
   {
     label: "Operations",
     items: [
+      { to: "/feed", icon: <Rss size={15} />, label: "Intelligence Feed" },
       { to: "/services", icon: <Server size={15} />, label: "Services" },
       { to: "/automations", icon: <Zap size={15} />, label: "Automations" },
       { to: "/runs", icon: <Play size={15} />, label: "Runs" },
@@ -54,6 +61,8 @@ const navGroups: NavGroup[] = [
     items: [
       { to: "/skills-personas", icon: <Brain size={15} />, label: "Skills & Personas" },
       { to: "/health", icon: <Activity size={15} />, label: "Health" },
+      { to: "/logs", icon: <Terminal size={15} />, label: "Logs" },
+      { to: "/explorer", icon: <Database size={15} />, label: "DB Explorer" },
       { to: "/settings", icon: <SettingsIcon size={15} />, label: "Settings" },
     ],
   },
@@ -240,6 +249,10 @@ function AppShell() {
             <Route path="/runs" element={<ErrorBoundary label="Runs"><RunsPage /></ErrorBoundary>} />
             <Route path="/runs/:id" element={<ErrorBoundary label="Run Detail"><RunDetail /></ErrorBoundary>} />
             <Route path="/review" element={<ErrorBoundary label="Needs Review"><NeedsReview onRefresh={fetchDashboard} /></ErrorBoundary>} />
+            <Route path="/feed" element={<ErrorBoundary label="Intelligence Feed"><FeedPage /></ErrorBoundary>} />
+            <Route path="/logs" element={<ErrorBoundary label="Logs"><LogsPage /></ErrorBoundary>} />
+            <Route path="/explorer" element={<ErrorBoundary label="DB Explorer"><ExplorerPage /></ErrorBoundary>} />
+            <Route path="/changelog" element={<ErrorBoundary label="Workspace Changelog"><ChangelogPage /></ErrorBoundary>} />
             <Route path="/skills-personas" element={<ErrorBoundary label="Skills & Personas"><SkillsPersonas /></ErrorBoundary>} />
             <Route path="/health" element={<ErrorBoundary label="Health"><HealthPage /></ErrorBoundary>} />
             <Route path="/settings" element={<ErrorBoundary label="Settings"><SettingsPage /></ErrorBoundary>} />

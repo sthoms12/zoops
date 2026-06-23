@@ -1,98 +1,109 @@
 # ZoOps
 
-A management dashboard for [Zo Computer](https://zo.computer) — built by a Zo user, for Zo users.
+A personal ops dashboard for [Zo Computer](https://zo.computer) — built by a Zo user, for Zo users.
 
-Track your workflows, services, browser tasks, prompts, skills, and system health without needing AI to be running.
+See what's running on your Zo, tail logs, browse your databases, track automation outputs, and monitor workspace health — all in one place, without needing AI to be active.
 
 ---
 
-## What it does
+## Install
 
-ZoOps is a Zo-native ops plane. It gives you a persistent, visual record of everything happening on your Zo Computer:
+### Fastest: ask your Zo AI
 
-- **Command Center** — live stats, warnings, recent runs, health snapshot
-- **Services** — registered Zo services with HTTP health checks
-- **Workflows** — prompt-driven workflow CRUD with stale/health tracking
-- **Runs** — full run history; paste output, approve/reject, add notes
-- **Needs Review** — aggregated action queue (failed runs, issues, items)
-- **Browser Tasks** — playbook library + session log
-- **Prompt Registry** — per-workflow versioned prompt history
-- **Skills & Personas** — catalog of workspace skills + personas
-- **Discovery** — auto-scanned workspace items (sites, DBs, skills, logs)
-- **Health** — system check (disk, mem, load) + ZoOps operational checks
-- **Settings** — persistent key/value config via SQLite
+Open your Zo chat and send this one message:
+
+> Install ZoOps from github.com/sthoms12/zoops and register it as a private service
+
+Your Zo AI will clone the repo, install dependencies, and register it as a persistent private service automatically.
+
+---
+
+### Terminal one-liner
+
+Open your [Zo terminal](/?t=terminal) and run:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/sthoms12/zoops/main/setup.sh | bash
+```
+
+The script clones, installs, and attempts to auto-register the service using your Zo identity token. If that step fails it prints the exact prompt to paste into your Zo chat.
+
+---
+
+### Manual steps
+
+```bash
+git clone https://github.com/sthoms12/zoops /home/workspace/zoops
+cd /home/workspace/zoops
+bun install
+```
+
+Then ask your Zo AI:
+
+> Register ZoOps as a private Zo service. Entrypoint: `bash -c "cd /home/workspace/zoops && NODE_ENV=production bun run server.ts"`, port 50165.
+
+---
+
+## What's inside
+
+| Page | What it does |
+|------|-------------|
+| **Command Center** | Stats, health warnings, recent runs, system snapshot |
+| **Intelligence Feed** | Scrollable timeline of automation run outputs, searchable by keyword |
+| **Services** | Zo services with live HTTP health checks |
+| **Automations** | All your scheduled Zo agents — schedule, next run, delivery method |
+| **Runs** | Full run history; paste output, add notes, approve/reject |
+| **Needs Review** | Action queue: failed runs, open items |
+| **Discovery** | Auto-scanned workspace items (sites, DBs, skills, logs) |
+| **Workspace Changelog** | Diff between discovery scans — what was added or removed |
+| **Log Viewer** | Live tail of any `/dev/shm/*.log` service log, with severity coloring |
+| **DB Explorer** | Browse and query any SQLite database discovered in your workspace |
+| **Skills & Personas** | Catalog of workspace skills and personas |
+| **Health** | System check (disk, memory, load, versions) |
+| **Settings** | Persistent key/value config |
 
 ---
 
 ## Stack
 
-- **Runtime**: Bun + Hono (API server)
-- **Frontend**: React 19 + Vite 7 + Tailwind v4 + shadcn/ui
-- **Database**: SQLite via `better-sqlite3`
-- **No external dependencies** — reads your Zo filesystem directly
-
----
-
-## Requirements
-
-- A [Zo Computer](https://zo.computer) account
-- Bun installed (`curl -fsSL https://bun.sh/install | bash`)
-
----
-
-## Installation
-
-```bash
-# Clone into your Zo workspace
-cd /home/workspace
-git clone https://github.com/sthoms12/zoops.git
-cd zoops
-
-# Install dependencies
-bun install
-
-# Start the dev server
-bun run dev
-```
-
-The app runs on port **50165**. Access it via your Zo site preview or register it as a service.
-
----
-
-## Registering as a Zo Service
-
-To keep ZoOps running persistently (survives restarts), register it as a Zo user service from your Zo chat:
-
-> "Register ZoOps as a private Zo service. The entrypoint is `bun run prod` in `/home/workspace/zoops`, port 50165."
-
-This tells Claude to call `register_user_service` with the right config. ZoOps will then auto-start on boot and get a persistent private URL.
+- **Runtime**: Bun + Hono
+- **Frontend**: React + Vite + Tailwind v4 + shadcn/ui
+- **Database**: SQLite (local, zero config)
+- **No external services** — reads your Zo filesystem directly
 
 ---
 
 ## Scripts
 
 | Command | What it does |
-|---|---|
-| `bun run dev` | Dev server (HMR, port 50165 + Vite on 50166) |
+|---------|-------------|
+| `bun run dev` | Dev server (port 50165, Vite HMR on 50166) |
 | `bun run build` | Production build into `dist/` |
-| `bun run prod` | Build + serve production on port 50165 |
+| `bun run prod` | Build + serve production |
 
 ---
 
 ## Data
 
-All state lives in `data/zoops.db` (SQLite). This directory is gitignored — each Zo Computer gets its own fresh database on first run.
-
-On startup, ZoOps automatically:
-- Initializes the schema
-- Scans your workspace for services, skills, and personas
-- Loads a system health snapshot
+All state lives in `data/zoops.db` (SQLite, gitignored). Each install gets a fresh database. On first boot, ZoOps scans your workspace and seeds from live Zo data — no fake placeholder content.
 
 ---
 
-## AGENTS.md
+## For Zo AI: Install Procedure
 
-The `AGENTS.md` file in this repo is a Claude Code agent guide. When Claude Code is running in this directory, it automatically loads these instructions — so Claude knows how to restart the server, understand the architecture, and operate ZoOps on your behalf.
+When a user asks you to install ZoOps, follow these steps:
+
+1. Clone the repo: `git clone https://github.com/sthoms12/zoops /home/workspace/zoops`
+2. Install: `cd /home/workspace/zoops && bun install`
+3. Register as a private Zo service:
+   - Name: `ZoOps`
+   - Entrypoint: `bash -c "cd /home/workspace/zoops && NODE_ENV=production bun run server.ts"`
+   - Local port: `50165`
+   - Mode: `http`
+   - Private: `true`
+4. Return the service URL to the user.
+
+If `/home/workspace/zoops` already exists, run `git pull` instead of cloning.
 
 ---
 
@@ -100,6 +111,4 @@ The `AGENTS.md` file in this repo is a Claude Code agent guide. When Claude Code
 
 MIT — free to use, modify, and share.
 
----
-
-Built by [@thomstech](https://github.com/sthoms12) with [Zo Computer](https://zo.computer).
+Built by [@thomstech](https://github.com/sthoms12) · [Zo Computer](https://zo.computer)
