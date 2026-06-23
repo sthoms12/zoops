@@ -464,6 +464,80 @@ app.delete("/api/skills-personas/:id", c => {
   return c.json({ ok: true });
 });
 
+// ── AUTOMATIONS ──────────────────────────────────────────────────
+const ZO_API_BASE = "https://api.zo.computer";
+const ZO_MODEL = "byok:dc47f089-b83c-4809-a761-bce177448a62";
+const AUTOMATIONS_CACHE_TTL_MS = 5 * 60 * 1000;
+
+async function refreshAutomationsCache(): Promise<void> {
+  const token = process.env.ZO_CLIENT_IDENTITY_TOKEN;
+  if (!token) throw new Error("ZO_CLIENT_IDENTITY_TOKEN not available");
+
+  const res = await fetch(`${ZO_API_BASE}/zo/ask`, {
+    method: "POST",
+    headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      input: "List all my automations. Return only valid JSON with all fields.",
+      model_name: ZO_MODEL,
+      output_format: {
+        type: "object",
+        properties: {
+          automations: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                id: { type: "string" },
+                title: { type: "string" },
+                active: { type: "boolean" },
+                next_run: { type: "string" },
+                rrule: { type: "string" },
+                result_delivery_method: { type: "string" },
+              },
+              required: ["id", "title", "active"],
+            },
+          },
+        },
+        required: ["automations"],
+      },
+    }),
+    signal: AbortSignal.timeout(30000),
+  });
+
+  if (!res.ok) throw new Error(`Zo API ${res.status}`);
+  const data = await res.json() as any;
+  const list: any[] = data?.output?.automations ?? [];
+
+  db.transaction(() => {
+    db.prepare("DELETE FROM zo_automations").run();
+    const insert = db.prepare(`INSERT INTO zo_automations (id,title,delivery_method,schedule_summary,next_run,active,created_at)
+      VALUES (?,?,?,?,?,?,datetime('now'))`);
+    for (const a of list) {
+      insert.run(a.id, a.title, a.result_delivery_method ?? null, a.rrule ?? null, a.next_run ?? null, a.active ? 1 : 0);
+    }
+    db.prepare("INSERT OR REPLACE INTO settings (key,value,updated_at) VALUES (?,?,?)").run("automations_last_sync", now(), now());
+  })();
+}
+
+app.get("/api/automations", async c => {
+  const lastSync = (db.prepare("SELECT value FROM settings WHERE key='automations_last_sync'").get() as any)?.value;
+  const stale = !lastSync || (Date.now() - new Date(lastSync).getTime() > AUTOMATIONS_CACHE_TTL_MS);
+  if (stale) {
+    try { await refreshAutomationsCache(); } catch (e: any) { console.error("Automations refresh failed:", e.message); }
+  }
+  return c.json(db.prepare("SELECT * FROM zo_automations ORDER BY title").all());
+});
+
+app.post("/api/automations/refresh", async c => {
+  try {
+    await refreshAutomationsCache();
+    const count = (db.prepare("SELECT COUNT(*) as c FROM zo_automations").get() as any).c;
+    return c.json({ ok: true, count });
+  } catch (e: any) {
+    return c.json({ error: e.message }, 500);
+  }
+});
+
 // ── HEALTH ───────────────────────────────────────────────────────
 app.get("/api/health", c => {
   try {

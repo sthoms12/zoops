@@ -21,6 +21,7 @@ import PromptRegistry from "@/pages/PromptRegistry";
 import SkillsPersonas from "@/pages/SkillsPersonas";
 import HealthPage from "@/pages/Health";
 import SettingsPage from "@/pages/Settings";
+import AutomationsPage from "@/pages/Automations";
 
 type NavGroup = {
   label: string;
@@ -47,6 +48,7 @@ const navGroups: NavGroup[] = [
     label: "Operations",
     items: [
       { to: "/services", icon: <Server size={15} />, label: "Services" },
+      { to: "/automations", icon: <Zap size={15} />, label: "Automations" },
       { to: "/workflows", icon: <Workflow size={15} />, label: "Workflows" },
       { to: "/runs", icon: <Play size={15} />, label: "Runs" },
       { to: "/review", icon: <Inbox size={15} />, label: "Needs Review", badgeKey: "pendingReviews" },
@@ -246,6 +248,7 @@ function AppShell() {
             <Route path="/" element={<ErrorBoundary label="Command Center"><CommandCenter onRefresh={fetchDashboard} /></ErrorBoundary>} />
             <Route path="/discovery" element={<ErrorBoundary label="Discovery"><DiscoveryPage /></ErrorBoundary>} />
             <Route path="/services" element={<ErrorBoundary label="Services"><ServicesPage /></ErrorBoundary>} />
+            <Route path="/automations" element={<ErrorBoundary label="Automations"><AutomationsPage /></ErrorBoundary>} />
             <Route path="/workflows" element={<ErrorBoundary label="Workflows"><WorkflowsPage /></ErrorBoundary>} />
             <Route path="/workflows/:id" element={<ErrorBoundary label="Workflow Detail"><WorkflowDetail /></ErrorBoundary>} />
             <Route path="/runs" element={<ErrorBoundary label="Runs"><RunsPage /></ErrorBoundary>} />
