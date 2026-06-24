@@ -1,9 +1,9 @@
 import { BrowserRouter, Route, Routes, Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import {
-  LayoutDashboard, Search, Server, Play, Inbox,
+  LayoutDashboard, Search, Server, Play,
   Brain, Activity, Settings as SettingsIcon, Zap, Menu, X,
-  Rss, Terminal, Database, GitCompare,
+  Rss, Terminal, Database, GitCompare, Globe, Calendar as CalendarIcon,
 } from "lucide-react";
 import { Toaster } from "sonner";
 import { cn } from "@/lib/utils";
@@ -12,13 +12,15 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import CommandCenter from "@/pages/CommandCenter";
 import DiscoveryPage from "@/pages/Discovery";
 import ServicesPage from "@/pages/Services";
+import SitesPage from "@/pages/Sites";
 import RunsPage from "@/pages/Runs";
 import RunDetail from "@/pages/RunDetail";
-import NeedsReview from "@/pages/NeedsReview";
 import SkillsPersonas from "@/pages/SkillsPersonas";
 import HealthPage from "@/pages/Health";
 import SettingsPage from "@/pages/Settings";
 import AutomationsPage from "@/pages/Automations";
+import AutomationCalendarPage from "@/pages/AutomationCalendar";
+import AutomationDetail from "@/pages/AutomationDetail";
 import FeedPage from "@/pages/Feed";
 import LogsPage from "@/pages/Logs";
 import ExplorerPage from "@/pages/Explorer";
@@ -50,10 +52,11 @@ const navGroups: NavGroup[] = [
     label: "Operations",
     items: [
       { to: "/feed", icon: <Rss size={15} />, label: "Intelligence Feed" },
+      { to: "/sites", icon: <Globe size={15} />, label: "Sites & Services" },
       { to: "/services", icon: <Server size={15} />, label: "Services" },
       { to: "/automations", icon: <Zap size={15} />, label: "Automations" },
+      { to: "/calendar", icon: <CalendarIcon size={15} />, label: "Schedule" },
       { to: "/runs", icon: <Play size={15} />, label: "Runs" },
-      { to: "/review", icon: <Inbox size={15} />, label: "Needs Review", badgeKey: "pendingReviews" },
     ],
   },
   {
@@ -87,7 +90,7 @@ function AppShell() {
       const res = await fetch("/api/dashboard");
       if (res.ok) {
         const data = await res.json();
-        setBadges({ pendingReviews: data.stats.pendingReviews });
+        setBadges({});
         setHealthStatus(data.latestHealth?.overall_status ?? "unknown");
       }
     } catch {}
@@ -245,10 +248,12 @@ function AppShell() {
             <Route path="/" element={<ErrorBoundary label="Command Center"><CommandCenter onRefresh={fetchDashboard} /></ErrorBoundary>} />
             <Route path="/discovery" element={<ErrorBoundary label="Discovery"><DiscoveryPage /></ErrorBoundary>} />
             <Route path="/services" element={<ErrorBoundary label="Services"><ServicesPage /></ErrorBoundary>} />
+            <Route path="/sites" element={<ErrorBoundary label="Live Sites"><SitesPage /></ErrorBoundary>} />
             <Route path="/automations" element={<ErrorBoundary label="Automations"><AutomationsPage /></ErrorBoundary>} />
+            <Route path="/automations/:id" element={<ErrorBoundary label="Automation Detail"><AutomationDetail /></ErrorBoundary>} />
+            <Route path="/calendar" element={<ErrorBoundary label="Schedule"><AutomationCalendarPage /></ErrorBoundary>} />
             <Route path="/runs" element={<ErrorBoundary label="Runs"><RunsPage /></ErrorBoundary>} />
             <Route path="/runs/:id" element={<ErrorBoundary label="Run Detail"><RunDetail /></ErrorBoundary>} />
-            <Route path="/review" element={<ErrorBoundary label="Needs Review"><NeedsReview onRefresh={fetchDashboard} /></ErrorBoundary>} />
             <Route path="/feed" element={<ErrorBoundary label="Intelligence Feed"><FeedPage /></ErrorBoundary>} />
             <Route path="/logs" element={<ErrorBoundary label="Logs"><LogsPage /></ErrorBoundary>} />
             <Route path="/explorer" element={<ErrorBoundary label="DB Explorer"><ExplorerPage /></ErrorBoundary>} />

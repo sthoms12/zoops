@@ -246,6 +246,28 @@ export function persistDiscovery(items: DiscoveredItem[]) {
   }
 }
 
+export function syncZoSitesToServices(): { added: string[]; total: number } {
+  const zosites = findFiles(WORKSPACE, "zosite.json");
+  const insert = db.prepare(`
+    INSERT OR IGNORE INTO services (id, name, type, status, endpoint, port, notes, last_checked_at)
+    VALUES (?, ?, 'zo-site', 'detected', NULL, ?, ?, datetime('now'))
+  `);
+  const added: string[] = [];
+  for (const p of zosites) {
+    try {
+      const cfg = JSON.parse(safeRead(p));
+      const name: string = cfg.name || basename(dirname(p));
+      const id = name.replace(/[^a-zA-Z0-9]/g, "_");
+      const port: number | null = cfg.local_port || null;
+      const notes = `Zo Site in ${dirname(p)}`;
+      const result = insert.run(id, name, port, notes);
+      if (result.changes > 0) added.push(name);
+    } catch {}
+  }
+  const total = (db.prepare("SELECT COUNT(*) as c FROM services WHERE type='zo-site'").get() as { c: number })?.c ?? 0;
+  return { added, total };
+}
+
 export function detectServicesFromLogs(): Array<{ name: string; logPath: string; errPath: string | null }> {
   const services: Array<{ name: string; logPath: string; errPath: string | null }> = [];
   try {

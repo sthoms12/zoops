@@ -7,10 +7,9 @@ import { toast } from "sonner";
 interface DashboardData {
   stats: {
     failedRuns: number;
-    pendingReviews: number;
     successRate: number;
     totalRuns: number;
-    serviceCount: number;
+    liveSites: number;
     discoveredCount: number;
   };
   healthWarnings: string[];
@@ -164,9 +163,8 @@ export default function CommandCenter({ onRefresh }: { onRefresh: () => void }) 
       {/* Stats grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <StatCard label="Failed Runs" value={stats.failedRuns} to="/runs" color={stats.failedRuns > 0 ? "red" : "green"} sub={`of ${stats.totalRuns} total`} />
-        <StatCard label="Pending Review" value={stats.pendingReviews} to="/review" color={stats.pendingReviews > 0 ? "yellow" : "green"} />
         <StatCard label="Run Success Rate" value={`${stats.successRate}%`} color={stats.successRate >= 80 ? "green" : stats.successRate >= 50 ? "yellow" : "red"} />
-        <StatCard label="Services Tracked" value={stats.serviceCount} to="/services" color="blue" />
+        <StatCard label="Sites & Services" value={stats.liveSites} to="/sites" color="blue" />
         <StatCard label="Discovered Items" value={stats.discoveredCount} to="/discovery" color="blue" />
       </div>
 

@@ -4,7 +4,7 @@ import { readFileSync, existsSync } from "fs";
 import { join } from "path";
 
 export function seedIfEmpty() {
-  const count = (db.prepare("SELECT COUNT(*) as c FROM workflows").get() as { c: number })?.c ?? 0;
+  const count = (db.prepare("SELECT COUNT(*) as c FROM services").get() as { c: number })?.c ?? 0;
   if (count > 0) return;
 
   // ── Services from real log files ──────────────────────────────

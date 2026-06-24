@@ -27,6 +27,17 @@ export function fmtDateTime(iso: string | null | undefined): string {
 export function fmtRelative(iso: string | null | undefined): string {
   if (!iso) return "Never";
   const diff = Date.now() - normalizeDate(iso).getTime();
+  if (diff < 0) {
+    const abs = -diff;
+    const mins = Math.floor(abs / 60000);
+    const hours = Math.floor(abs / 3600000);
+    const days = Math.floor(abs / 86400000);
+    if (mins < 1) return "Just now";
+    if (mins < 60) return `in ${mins}m`;
+    if (hours < 24) return `in ${hours}h`;
+    if (days < 30) return `in ${days}d`;
+    return fmtDate(iso);
+  }
   const mins = Math.floor(diff / 60000);
   const hours = Math.floor(diff / 3600000);
   const days = Math.floor(diff / 86400000);

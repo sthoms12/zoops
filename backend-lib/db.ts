@@ -134,8 +134,12 @@ export function initDb() {
     next_run TEXT,
     active INTEGER DEFAULT 1,
     instruction_summary TEXT,
+    user_notes TEXT,
     created_at TEXT DEFAULT (datetime('now'))
   )`);
+
+  // Migration: add user_notes to existing databases
+  try { db.run("ALTER TABLE zo_automations ADD COLUMN user_notes TEXT"); } catch {}
 
   db.run(`CREATE TABLE IF NOT EXISTS scan_deltas (
     id TEXT PRIMARY KEY,
