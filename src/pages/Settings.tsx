@@ -103,12 +103,6 @@ export default function SettingsPage() {
               <SettingRow label="App Name" description="Display name for this ZoOps instance">
                 <SettingInput value={s.appName || "ZoOps"} onChange={v => update("appName", v)} placeholder="ZoOps" />
               </SettingRow>
-              <SettingRow label="Default Model" description="Model used for AI suggestions when enabled">
-                <SettingInput value={s.defaultModel || "claude-sonnet-4-6"} onChange={v => update("defaultModel", v)} placeholder="claude-sonnet-4-6" />
-              </SettingRow>
-              <SettingRow label="Default Persona" description="Persona applied to AI-assisted runs">
-                <SettingInput value={s.defaultPersona || ""} onChange={v => update("defaultPersona", v)} placeholder="Leave blank for default" />
-              </SettingRow>
             </div>
           </section>
 
