@@ -6,6 +6,11 @@ See what's running on your Zo, tail logs, browse your databases, track automatio
 
 ---
 
+> **⚠️ Always install as a private service.**
+> ZoOps exposes your workspace files, service logs, database contents, run history, and system metrics. It has no authentication layer of its own — it relies entirely on Zo's private service gating. Never publish it as a public service or expose it on a public port. The install instructions below register it as private by default; don't change that.
+
+---
+
 ## Install
 
 ### Fastest: ask your Zo AI
@@ -50,10 +55,12 @@ Then ask your Zo AI:
 |------|-------------|
 | **Command Center** | Stats, health warnings, recent runs, system snapshot |
 | **Intelligence Feed** | Scrollable timeline of automation run outputs, searchable by keyword |
-| **Services** | Zo services with live HTTP health checks |
+| **Sites & Services** | Zo sites with port and publish info |
+| **Services** | All registered services with live HTTP health checks |
 | **Automations** | All your scheduled Zo agents — schedule, next run, delivery method |
+| **Schedule** | 28-day calendar view of automation runs — past results and upcoming schedule |
 | **Runs** | Full run history; paste output, add notes, approve/reject |
-| **Needs Review** | Action queue: failed runs, open items |
+| **Review Queue** | Action queue: failed runs and flagged items needing attention |
 | **Discovery** | Auto-scanned workspace items (sites, DBs, skills, logs) |
 | **Workspace Changelog** | Diff between discovery scans — what was added or removed |
 | **Log Viewer** | Live tail of any `/dev/shm/*.log` service log, with severity coloring |
