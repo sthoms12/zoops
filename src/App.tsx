@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import {
   LayoutDashboard, Search, Server, Play,
   Brain, Activity, Settings as SettingsIcon, Zap, Menu, X,
-  Rss, Terminal, Database, GitCompare, Globe, Calendar as CalendarIcon,
+  Rss, Terminal, Database, GitCompare, Globe, Calendar as CalendarIcon, Inbox,
 } from "lucide-react";
 import { Toaster } from "sonner";
 import { cn } from "@/lib/utils";
@@ -25,6 +25,7 @@ import FeedPage from "@/pages/Feed";
 import LogsPage from "@/pages/Logs";
 import ExplorerPage from "@/pages/Explorer";
 import ChangelogPage from "@/pages/Changelog";
+import ReviewQueuePage from "@/pages/ReviewQueue";
 
 type NavGroup = {
   label: string;
@@ -57,6 +58,7 @@ const navGroups: NavGroup[] = [
       { to: "/automations", icon: <Zap size={15} />, label: "Automations" },
       { to: "/calendar", icon: <CalendarIcon size={15} />, label: "Schedule" },
       { to: "/runs", icon: <Play size={15} />, label: "Runs" },
+      { to: "/review", icon: <Inbox size={15} />, label: "Review Queue" },
     ],
   },
   {
@@ -261,6 +263,7 @@ function AppShell() {
             <Route path="/skills-personas" element={<ErrorBoundary label="Skills & Personas"><SkillsPersonas /></ErrorBoundary>} />
             <Route path="/health" element={<ErrorBoundary label="Health"><HealthPage /></ErrorBoundary>} />
             <Route path="/settings" element={<ErrorBoundary label="Settings"><SettingsPage /></ErrorBoundary>} />
+            <Route path="/review" element={<ErrorBoundary label="Review Queue"><ReviewQueuePage /></ErrorBoundary>} />
           </Routes>
         </div>
       </main>

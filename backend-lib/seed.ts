@@ -14,7 +14,6 @@ export function seedIfEmpty() {
     VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`);
 
   const knownEndpoints: Record<string, { port?: number; endpoint?: string; type: string }> = {
-    "m365-barometer": { port: 50788, type: "zo-site" },
     "zoops": { port: 56874, type: "zo-site" },
   };
 
@@ -33,15 +32,17 @@ export function seedIfEmpty() {
   // Add ZoOps itself if not detected from logs
   if (!detectedServices.find(s => s.name === "zoops")) {
     insertSvc.run("zoops", "zoops", "/home/workspace/zoops", "zo-site",
-      "healthy", "https://zoops-thomstech.zo.computer", 56874, now(),
+      "healthy", null, 56874, now(),
       "ZoOps — Zo-native management plane", 0, now(), now());
   }
 
-  // ── Real Zo automations ──────────────────────────────────────
+  // ── Automations — live snapshot takes priority, fallback to bundled examples ──
   const autoPath = join(import.meta.dir, "../data/automations-snapshot.json");
-  if (existsSync(autoPath)) {
+  const fallbackAutoPath = join(import.meta.dir, "seed/automations.json");
+  const resolvedAutoPath = existsSync(autoPath) ? autoPath : existsSync(fallbackAutoPath) ? fallbackAutoPath : null;
+  if (resolvedAutoPath) {
     try {
-      const autos = JSON.parse(readFileSync(autoPath, "utf-8"));
+      const autos = JSON.parse(readFileSync(resolvedAutoPath, "utf-8"));
       const insertAuto = db.prepare(`INSERT OR IGNORE INTO zo_automations
         (id,title,category,delivery_method,schedule_summary,next_run,active,instruction_summary,created_at)
         VALUES (?,?,?,?,?,?,?,?,?)`);
@@ -49,21 +50,17 @@ export function seedIfEmpty() {
         insertAuto.run(a.id, a.title, a.category, a.delivery_method, a.schedule_summary,
           a.next_run, a.active ? 1 : 0, a.instruction_summary, now());
       }
-      console.log(`ZoOps: seeded ${autos.length} real Zo automations`);
+      const source = resolvedAutoPath === autoPath ? "live snapshot" : "bundled examples";
+      console.log(`ZoOps: seeded ${autos.length} automations (${source})`);
     } catch (e) {
       console.error("ZoOps: failed to seed automations:", e);
     }
   }
 
-  // ── Real persona ─────────────────────────────────────────────
+  // ── Skills from real filesystem discovery ────────────────────
   const insertSp = db.prepare(`INSERT OR IGNORE INTO skills_personas
     (id,type,name,path,purpose,notes,is_auto_detected,created_at,updated_at)
     VALUES (?,?,?,?,?,?,?,?,?)`);
-  insertSp.run("persona-my-persona", "persona", "My Persona", null,
-    "Be concise, detailed, direct (no fluff), friendly and warm.",
-    "Default Zo persona — configured in Settings → AI → Personas", 0, now(), now());
-
-  // ── Skills from real filesystem discovery ────────────────────
   const SkillsDir = "/home/workspace/Skills";
   if (existsSync(SkillsDir)) {
     const { readdirSync, statSync, readFileSync: rf } = require("fs");

@@ -353,7 +353,7 @@ app.post("/api/automations/:id/run", async c => {
   return c.json({
     error: "no_trigger_api",
     title: automation.title,
-    zo_url: "https://thomstech.zo.computer/?t=automations",
+    zo_url: `${process.env.ZO_BASE_URL || "https://your-handle.zo.computer"}/?t=automations`,
   }, 501);
 });
 

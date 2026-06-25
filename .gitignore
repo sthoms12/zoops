@@ -27,3 +27,6 @@ Thumbs.db
 
 # Stray db files outside data/
 backend-lib/*.db
+
+# Screenshot artifacts
+--full-page

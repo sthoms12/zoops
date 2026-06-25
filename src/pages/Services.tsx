@@ -94,7 +94,7 @@ function AddServiceModal({ onClose, onAdded }: { onClose: () => void; onAdded: (
         <h3 className="text-base font-semibold">Register Service</h3>
         <form onSubmit={submit} className="space-y-3">
           {[
-            { label: "Name *", key: "name", placeholder: "m365-barometer" },
+            { label: "Name *", key: "name", placeholder: "my-service" },
             { label: "Endpoint", key: "endpoint", placeholder: "https://..." },
             { label: "Port", key: "port", placeholder: "51017" },
             { label: "Notes", key: "notes", placeholder: "Optional notes" },

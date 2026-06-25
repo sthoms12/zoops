@@ -32,7 +32,7 @@ REGISTERED=false
 if [ -n "${ZO_CLIENT_IDENTITY_TOKEN:-}" ]; then
   echo "  → Registering as a Zo service..."
 
-  PAYLOAD='{"input":"Register a new private HTTP Zo service: name ZoOps, entrypoint bash -c '\''cd /home/workspace/zoops && NODE_ENV=production bun run server.ts'\'', local_port 50165, private true. Reply with just the service URL.","model_name":"byok:dc47f089-b83c-4809-a761-bce177448a62"}'
+  PAYLOAD='{"input":"Register a new private HTTP Zo service: name ZoOps, entrypoint bash -c '\''cd /home/workspace/zoops && NODE_ENV=production bun run server.ts'\'', local_port 50165, private true. Reply with just the service URL."}'
 
   RESPONSE=$(curl -sf --max-time 60 -X POST "https://api.zo.computer/zo/ask" \
     -H "Authorization: Bearer $ZO_CLIENT_IDENTITY_TOKEN" \
