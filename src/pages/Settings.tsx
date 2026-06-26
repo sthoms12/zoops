@@ -116,9 +116,6 @@ export default function SettingsPage() {
               <SettingRow label="Memory Warning %" description="Memory usage percentage that triggers a health warning">
                 <SettingInput value={s.memWarningPercent || "80"} onChange={v => update("memWarningPercent", v)} type="number" />
               </SettingRow>
-              <SettingRow label="Failed Runs Warning" description="Number of failed runs in 24h before health warning">
-                <SettingInput value={s.failedRunsWarningCount || "3"} onChange={v => update("failedRunsWarningCount", v)} type="number" />
-              </SettingRow>
             </div>
           </section>
 

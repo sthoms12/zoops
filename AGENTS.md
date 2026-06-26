@@ -43,7 +43,7 @@ data/
 | `/feed` | Intelligence Feed | Run output timeline, searchable, filterable by workflow |
 | `/sites` | Sites & Services | Zo sites, space pages, and published service surfaces |
 | `/services` | Services | Zo services + HTTP health checks |
-| `/automations` | Automations | Zo scheduled agents (synced from Zo API, cached) |
+| `/automations` | Automations | Zo scheduled agents cached from `data/automations-snapshot.json` |
 | `/automations/:id` | AutomationDetail | Run history, stats, and notes for one automation |
 | `/calendar` | Schedule | Past actual runs plus upcoming scheduled runs |
 | `/runs` | Runs | All workflow runs, filter by status |
@@ -105,7 +105,7 @@ When a user asks you to install ZoOps, follow these exact steps:
 - `discovered_items` — auto-scan results from discovery engine
 - `scan_deltas` — diff between consecutive discovery scans (added/removed items)
 - `health_snapshots` — point-in-time system health records
-- `zo_automations` — Zo scheduled agents (cached from Zo API, TTL 5 min)
+- `zo_automations` — Zo scheduled agents cached from a real local snapshot; do not seed fake/example rows
 - `app_events` — backend error log (pruned after 30 days)
 - `settings` — arbitrary key/value config
 

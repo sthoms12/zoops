@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, Calendar, Clock, Mail, CheckCircle, PauseCircle, Pencil, Check, X, ChevronRight, ExternalLink } from "lucide-react";
-import { cn, fmtRelative, STATUS_COLORS, statusLabel } from "@/lib/utils";
+import { ArrowLeft, Calendar, Clock, Mail, CheckCircle, PauseCircle, Pencil, Check, X } from "lucide-react";
+import { fmtRelative } from "@/lib/utils";
 import { toast } from "sonner";
 
 interface Automation {
@@ -13,15 +13,6 @@ interface Automation {
   active: number;
   user_notes: string | null;
   instruction_summary: string | null;
-}
-
-interface Run {
-  id: string;
-  status: string;
-  summary: string | null;
-  output: string | null;
-  created_at: string;
-  completed_at: string | null;
 }
 
 function parseSchedule(rrule: string | null): string {
@@ -45,39 +36,33 @@ function parseSchedule(rrule: string | null): string {
   } catch { return rrule; }
 }
 
-const STATUS_DOT: Record<string, string> = {
-  completed: "bg-emerald-400",
-  failed: "bg-red-500",
-  needs_review: "bg-orange-400",
-  pending: "bg-zinc-500",
-};
-
 export default function AutomationDetail() {
   const { id } = useParams<{ id: string }>();
   const [automation, setAutomation] = useState<Automation | null>(null);
-  const [runs, setRuns] = useState<Run[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingNotes, setEditingNotes] = useState(false);
   const [notesDraft, setNotesDraft] = useState("");
   const [savingNotes, setSavingNotes] = useState(false);
-  const [expandedOutput, setExpandedOutput] = useState(false);
 
-  useEffect(() => { if (id) load(id); }, [id]);
+  useEffect(() => {
+    if (!id) return;
+    load(id);
+    const interval = setInterval(() => load(id, true), 3 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [id]);
 
-  async function load(automationId: string) {
-    setLoading(true);
-    setExpandedOutput(false);
+  async function load(automationId: string, quiet = false) {
+    if (!quiet) setLoading(true);
     try {
       const res = await fetch(`/api/automations/${automationId}/history`);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       setAutomation(data.automation);
-      setRuns(data.runs);
-      setNotesDraft(data.automation.user_notes ?? "");
+      if (!quiet) setNotesDraft(data.automation.user_notes ?? "");
     } catch (e: any) {
-      toast.error(`Failed to load automation: ${e.message}`);
+      if (!quiet) toast.error(`Failed to load automation: ${e.message}`);
     } finally {
-      setLoading(false);
+      if (!quiet) setLoading(false);
     }
   }
 
@@ -122,11 +107,6 @@ export default function AutomationDetail() {
       </div>
     );
   }
-
-  const successCount = runs.filter(r => r.status === "completed").length;
-  const failCount = runs.filter(r => r.status === "failed" || r.status === "needs_review").length;
-  const successRate = runs.length > 0 ? Math.round((successCount / runs.length) * 100) : null;
-  const latestRun = runs[0] ?? null;
 
   return (
     <div className="p-6 space-y-6 max-w-3xl">
@@ -218,121 +198,6 @@ export default function AutomationDetail() {
         )}
       </div>
 
-      {/* Stats row */}
-      {runs.length > 0 && (
-        <div className="grid grid-cols-3 gap-3">
-          <div className="bg-card border border-border rounded-lg p-3 text-center">
-            <p className="text-2xl font-bold tabular-nums">{runs.length}</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Total Runs</p>
-          </div>
-          <div className={cn("bg-card border rounded-lg p-3 text-center", successRate !== null && successRate >= 80 ? "border-emerald-500/20" : "border-yellow-500/20")}>
-            <p className={cn("text-2xl font-bold tabular-nums", successRate !== null && successRate >= 80 ? "text-emerald-400" : "text-yellow-400")}>
-              {successRate !== null ? `${successRate}%` : "—"}
-            </p>
-            <p className="text-xs text-muted-foreground mt-0.5">Success Rate</p>
-          </div>
-          <div className={cn("bg-card border rounded-lg p-3 text-center", failCount > 0 ? "border-red-500/20" : "border-border")}>
-            <p className={cn("text-2xl font-bold tabular-nums", failCount > 0 ? "text-red-400" : "text-foreground")}>{failCount}</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Failed</p>
-          </div>
-        </div>
-      )}
-
-      {/* Run history dots */}
-      {runs.length > 0 && (
-        <div className="bg-card border border-border rounded-lg p-4">
-          <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
-            Run History (last {runs.length})
-          </h2>
-          <div className="flex items-center gap-1.5 flex-wrap">
-            {[...runs].reverse().map(r => (
-              <Link
-                key={r.id}
-                to={`/runs/${r.id}`}
-                title={`${statusLabel(r.status)} · ${fmtRelative(r.created_at)}`}
-                className={cn("w-3.5 h-3.5 rounded-full transition-opacity hover:opacity-70", STATUS_DOT[r.status] ?? "bg-zinc-500")}
-              />
-            ))}
-          </div>
-          <p className="text-[10px] text-zinc-600 mt-2">Oldest → Most recent. Click a dot to view that run.</p>
-        </div>
-      )}
-
-      {/* Latest output */}
-      {latestRun && (
-        <div className="bg-card border border-border rounded-lg overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-            <div>
-              <h2 className="text-sm font-medium">Latest Run</h2>
-              <p className="text-xs text-muted-foreground mt-0.5">{fmtRelative(latestRun.created_at)}</p>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className={cn("status-badge border text-[10px]", STATUS_COLORS[latestRun.status] || STATUS_COLORS.pending)}>
-                {statusLabel(latestRun.status)}
-              </span>
-              <Link to={`/runs/${latestRun.id}`} className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1">
-                <ExternalLink size={11} /> Full run
-              </Link>
-            </div>
-          </div>
-          {latestRun.summary && (
-            <div className="px-4 py-3 border-b border-border bg-secondary/20">
-              <p className="text-sm text-foreground leading-relaxed">{latestRun.summary}</p>
-            </div>
-          )}
-          {latestRun.output && (
-            <div className="px-4 py-3">
-              <pre className="text-xs font-mono text-muted-foreground whitespace-pre-wrap break-words leading-relaxed">
-                {expandedOutput ? latestRun.output : latestRun.output.slice(0, 400)}
-                {!expandedOutput && latestRun.output.length > 400 && <span className="text-zinc-600">…</span>}
-              </pre>
-              {latestRun.output.length > 400 && (
-                <button
-                  onClick={() => setExpandedOutput(e => !e)}
-                  className="mt-2 text-xs text-primary hover:underline"
-                >
-                  {expandedOutput ? "Show less" : "Show more"}
-                </button>
-              )}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* All runs list */}
-      {runs.length > 0 && (
-        <div className="bg-card border border-border rounded-lg overflow-hidden">
-          <div className="px-4 py-3 border-b border-border">
-            <h2 className="text-sm font-medium">All Runs</h2>
-          </div>
-          <div className="divide-y divide-border">
-            {runs.map(r => (
-              <Link
-                key={r.id}
-                to={`/runs/${r.id}`}
-                className="flex items-center gap-3 px-4 py-2.5 hover:bg-white/5 transition-colors"
-              >
-                <span className={cn("w-2 h-2 rounded-full shrink-0", STATUS_DOT[r.status] ?? "bg-zinc-500")} />
-                <div className="flex-1 min-w-0">
-                  {r.summary && <p className="text-xs text-muted-foreground truncate">{r.summary}</p>}
-                  <p className="text-[10px] text-zinc-600">{fmtRelative(r.created_at)}</p>
-                </div>
-                <span className={cn("status-badge border text-[10px] shrink-0", STATUS_COLORS[r.status] || STATUS_COLORS.pending)}>
-                  {statusLabel(r.status)}
-                </span>
-                <ChevronRight size={12} className="text-zinc-700 shrink-0" />
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {runs.length === 0 && (
-        <div className="rounded-lg border border-dashed border-border p-8 text-center">
-          <p className="text-sm text-muted-foreground">No runs recorded for this automation yet.</p>
-          <p className="text-xs text-zinc-600 mt-1">Run outputs will appear here once they've been logged.</p>
-        </div>
-      )}
     </div>
   );
 }

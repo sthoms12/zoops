@@ -38,13 +38,11 @@ export function seedIfEmpty() {
       "ZoOps — Zo-native management plane", 0, now(), now());
   }
 
-  // ── Automations — live snapshot takes priority, fallback to bundled examples ──
+  // ── Automations — seed only from a real Zo snapshot ───────────
   const autoPath = join(import.meta.dir, "../data/automations-snapshot.json");
-  const fallbackAutoPath = join(import.meta.dir, "seed/automations.json");
-  const resolvedAutoPath = existsSync(autoPath) ? autoPath : existsSync(fallbackAutoPath) ? fallbackAutoPath : null;
-  if (resolvedAutoPath) {
+  if (existsSync(autoPath)) {
     try {
-      const autos = JSON.parse(readFileSync(resolvedAutoPath, "utf-8"));
+      const autos = JSON.parse(readFileSync(autoPath, "utf-8"));
       const insertAuto = db.prepare(`INSERT OR IGNORE INTO zo_automations
         (id,title,category,delivery_method,schedule_summary,next_run,active,instruction_summary,created_at)
         VALUES (?,?,?,?,?,?,?,?,?)`);
@@ -52,8 +50,7 @@ export function seedIfEmpty() {
         insertAuto.run(a.id, a.title, a.category, a.delivery_method, a.schedule_summary,
           a.next_run, a.active ? 1 : 0, a.instruction_summary, now());
       }
-      const source = resolvedAutoPath === autoPath ? "live snapshot" : "bundled examples";
-      console.log(`ZoOps: seeded ${autos.length} automations (${source})`);
+      console.log(`ZoOps: seeded ${autos.length} automations from real Zo snapshot`);
     } catch (e) {
       console.error("ZoOps: failed to seed automations:", e);
     }
@@ -97,7 +94,6 @@ export function seedIfEmpty() {
     aiCallsEnabled: "false",
     diskWarningPercent: "70",
     memWarningPercent: "80",
-    failedRunsWarningCount: "3",
     scanPaths: "/home/workspace",
     externalReportingEnabled: "false",
     externalReportingEndpoint: "",
@@ -107,5 +103,5 @@ export function seedIfEmpty() {
     insertSetting.run(k, v, now());
   }
 
-  console.log("ZoOps: seed complete — live data where available, generic examples only as fallback");
+  console.log("ZoOps: seed complete — live data and real snapshots only");
 }

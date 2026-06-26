@@ -1,0 +1,9 @@
+[
+  {"path": "/", "route_type": "page", "public": true},
+  {"path": "/api/kalshi-bets", "route_type": "api", "public": true},
+  {"path": "/api/opportunity-vault", "route_type": "api", "public": true},
+  {"path": "/biz-finder", "route_type": "page", "public": false},
+  {"path": "/kalshi-tracker", "route_type": "page", "public": false},
+  {"path": "/opportunity-vault", "route_type": "page", "public": false},
+  {"path": "/zoops", "route_type": "page", "public": true}
+]

@@ -92,7 +92,7 @@ Then ask your Zo AI:
 
 ## Data
 
-All state lives in `data/zoops.db` (SQLite, gitignored). Each install gets a fresh database. On first boot, ZoOps scans your workspace, seeds from live Zo data where available, and falls back to a small set of generic example automations when no snapshot exists yet.
+All state lives in `data/zoops.db` (SQLite, gitignored). Each install gets a fresh database. On first boot, ZoOps scans your workspace and seeds automations from `data/automations-snapshot.json`, which is a real Zo automation snapshot, not example data. The Automations page `Refresh` button reloads that local snapshot quickly and does not call AI. Until Zo exposes a stable service-side automations API, newly created Zo automations need the snapshot/cache updated before ZoOps can display them.
 
 ---
 

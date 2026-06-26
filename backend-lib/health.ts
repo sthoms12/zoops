@@ -18,7 +18,6 @@ export interface HealthSnapshot {
   bun_version: string | null;
   node_version: string | null;
   sqlite_version: string | null;
-  failed_runs_24h: number;
   pending_reviews: number;
   stale_workflows: number;
   service_count: number;
@@ -104,18 +103,9 @@ export function runHealthCheck(): HealthSnapshot {
 
   const diskWarnPercent = getSettingNumber("diskWarningPercent", 70);
   const memWarnPercent = getSettingNumber("memWarningPercent", 80);
-  const failedRunsWarnCount = getSettingNumber("failedRunsWarningCount", 3);
   const staleThresholdDays = getSettingNumber("staleThresholdDays", 7);
 
   // App-level metrics
-  const failedRuns = (db.prepare(
-    `SELECT COUNT(*) as c FROM workflow_runs WHERE status='failed' AND created_at > datetime('now','-1 day')`
-  ).get() as { c: number })?.c ?? 0;
-
-  const pendingReviews = (db.prepare(
-    `SELECT COUNT(*) as c FROM workflow_runs WHERE review_status='pending' AND status IN ('needs_review','failed','completed')`
-  ).get() as { c: number })?.c ?? 0;
-
   const totalReviewItems = (db.prepare(
     `SELECT COUNT(*) as c FROM review_items WHERE status='pending'`
   ).get() as { c: number })?.c ?? 0;
@@ -135,13 +125,12 @@ export function runHealthCheck(): HealthSnapshot {
   // Determine overall status
   let overall_status: "healthy" | "warning" | "failed" = "healthy";
   if (
-    failedRuns > failedRunsWarnCount ||
     (disk.usedPercent !== null && disk.usedPercent >= 90) ||
     (mem.usedPercent !== null && mem.usedPercent >= 90)
   ) {
     overall_status = "failed";
   } else if (
-    pendingReviews + totalReviewItems > 0 ||
+    totalReviewItems > 0 ||
     staleWorkflows > 0 ||
     (disk.usedPercent !== null && disk.usedPercent >= diskWarnPercent) ||
     (mem.usedPercent !== null && mem.usedPercent >= memWarnPercent)
@@ -165,8 +154,7 @@ export function runHealthCheck(): HealthSnapshot {
     bun_version: versions.bun,
     node_version: versions.node,
     sqlite_version: versions.sqlite,
-    failed_runs_24h: failedRuns,
-    pending_reviews: pendingReviews + totalReviewItems,
+    pending_reviews: totalReviewItems,
     stale_workflows: staleWorkflows,
     service_count: serviceCount,
     details: {
@@ -188,7 +176,7 @@ export function runHealthCheck(): HealthSnapshot {
     snapshot.disk_used_percent, snapshot.disk_used_gb, snapshot.disk_total_gb,
     snapshot.mem_used_mb, snapshot.mem_total_mb, snapshot.mem_used_percent,
     snapshot.process_count, snapshot.bun_version, snapshot.node_version, snapshot.sqlite_version,
-    snapshot.failed_runs_24h, snapshot.pending_reviews, snapshot.stale_workflows, snapshot.service_count,
+    0, snapshot.pending_reviews, snapshot.stale_workflows, snapshot.service_count,
     JSON.stringify(snapshot.details)
   );
 

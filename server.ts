@@ -2,9 +2,10 @@ import { serveStatic } from "hono/bun";
 import { Hono } from "hono";
 import config from "./zosite.json";
 import { db, initDb, generateId, now } from "./backend-lib/db";
-import { runDiscovery, persistDiscovery, detectServicesFromLogs, syncZoSitesToServices } from "./backend-lib/discovery";
+import { runDiscovery, persistDiscovery, detectServicesFromLogs, syncZoSitesToServices, syncSpaceRoutesFromSnapshot } from "./backend-lib/discovery";
 import { runHealthCheck } from "./backend-lib/health";
 import { seedIfEmpty } from "./backend-lib/seed";
+import { syncAutomationsFromSnapshot, syncAutomationsFromZo } from "./backend-lib/automations";
 import { readdirSync, existsSync } from "fs";
 import { getRuntimePort } from "./backend-lib/settings";
 
@@ -15,6 +16,51 @@ const hasWorkflowsTable = () => {
   const row = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='workflows'").get() as { name?: string } | null;
   return !!row?.name;
 };
+
+let automationSyncState: {
+  syncing: boolean;
+  lastSyncAt: string | null;
+  lastError: string | null;
+  lastCount: number | null;
+  lastRemoved: number | null;
+  lastPartial: boolean;
+  lastExistingCount: number | null;
+} = {
+  syncing: false,
+  lastSyncAt: null,
+  lastError: null,
+  lastCount: null,
+  lastRemoved: null,
+  lastPartial: false,
+  lastExistingCount: null,
+};
+
+function queueAutomationSync() {
+  if (automationSyncState.syncing) return false;
+  automationSyncState.syncing = true;
+  automationSyncState.lastError = null;
+
+  void syncAutomationsFromZo()
+    .then((result) => {
+      automationSyncState.lastSyncAt = now();
+      automationSyncState.lastCount = result.count;
+      automationSyncState.lastRemoved = result.removed;
+      automationSyncState.lastPartial = result.partial;
+      automationSyncState.lastExistingCount = result.existingCount;
+      const partialNote = result.partial ? " partial response; kept existing cache rows" : "";
+      console.log(`ZoOps: synced ${result.count} automations (${result.removed} removed)${partialNote}`);
+    })
+    .catch((error) => {
+      const message = error instanceof Error ? error.message : String(error);
+      automationSyncState.lastError = message;
+      console.error("Automation sync error:", error);
+    })
+    .finally(() => {
+      automationSyncState.syncing = false;
+    });
+
+  return true;
+}
 
 function upsertWorkflow(workflowId: string | null | undefined, workflowName: string | null | undefined) {
   if (!workflowId || !workflowName || !hasWorkflowsTable()) return;
@@ -60,10 +106,49 @@ setTimeout(() => {
     console.log(`ZoOps: discovered ${items.length} local items`);
     const sync = syncZoSitesToServices();
     if (sync.added.length > 0) console.log(`ZoOps: auto-synced new Zo Sites: ${sync.added.join(", ")}`);
+    const spaceSync = syncSpaceRoutesFromSnapshot();
+    if (spaceSync.added.length > 0) console.log(`ZoOps: synced space routes: ${spaceSync.added.join(", ")}`);
   } catch (e) {
     console.error("Discovery scan error:", e);
   }
 }, 0);
+
+setTimeout(() => {
+  try {
+    const result = syncAutomationsFromSnapshot();
+    automationSyncState.lastSyncAt = now();
+    automationSyncState.lastCount = result.count;
+    automationSyncState.lastRemoved = 0;
+    automationSyncState.lastPartial = false;
+    automationSyncState.lastExistingCount = result.count;
+    console.log(`ZoOps: loaded ${result.count} automations from local snapshot`);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    automationSyncState.lastError = message;
+    console.error("Automation snapshot load error:", error);
+  }
+}, 0);
+
+// Sync automations from Zo API every 30 minutes so the list stays current
+// without requiring manual refresh.
+setInterval(() => queueAutomationSync(), 30 * 60 * 1000);
+
+// Re-scan every 5 minutes so new/removed services and discovered items appear automatically.
+setInterval(() => {
+  try {
+    const items = runDiscovery();
+    persistDiscovery(items);
+    syncZoSitesToServices();
+    syncSpaceRoutesFromSnapshot();
+  } catch (e) {
+    console.error("Background scan error:", e);
+  }
+}, 5 * 60 * 1000);
+
+// Generate health snapshot every 5 minutes so the health page stays current.
+setInterval(() => {
+  try { runHealthCheck(); } catch (e) { console.error("Background health error:", e); }
+}, 5 * 60 * 1000);
 
 const app = new Hono();
 
@@ -75,29 +160,20 @@ app.onError((err, c) => {
 
 // ── DASHBOARD ─────────────────────────────────────────────────────
 app.get("/api/dashboard", c => {
-  const runs = db.prepare("SELECT * FROM workflow_runs ORDER BY created_at DESC LIMIT 50").all() as any[];
   const liveSites = (db.prepare("SELECT COUNT(*) as c FROM services WHERE type IN ('zo-site','zo-space','space-page') OR (type='service' AND endpoint IS NOT NULL)").get() as { c: number })?.c ?? 0;
   const latestHealth = db.prepare("SELECT * FROM health_snapshots ORDER BY timestamp DESC LIMIT 1").get() as any;
   const discoveredCount = (db.prepare("SELECT COUNT(*) as c FROM discovered_items").get() as { c: number })?.c ?? 0;
-
-  const failedRuns = runs.filter(r => r.status === "failed").length;
-  const completedRuns = runs.filter(r => r.status === "completed").length;
-  const successRate = runs.length > 0 ? Math.round((completedRuns / runs.length) * 100) : 0;
-  const recentRuns = runs.slice(0, 8);
-
-  const healthWarnings: string[] = [];
-  if (failedRuns > 0) healthWarnings.push(`${failedRuns} failed run(s)`);
+  const automationsCount = (db.prepare("SELECT COUNT(*) as c FROM zo_automations WHERE active=1").get() as { c: number })?.c ?? 0;
+  const recentAutomations = db.prepare("SELECT id, title, next_run, active, schedule_summary FROM zo_automations ORDER BY next_run ASC LIMIT 6").all() as any[];
 
   return c.json({
     stats: {
-      failedRuns,
-      successRate,
-      totalRuns: runs.length,
+      automationsCount,
       liveSites,
       discoveredCount,
     },
-    healthWarnings,
-    recentRuns,
+    healthWarnings: [],
+    recentAutomations,
     latestHealth,
     lastScanAt: (db.prepare("SELECT last_seen_at FROM discovered_items ORDER BY last_seen_at DESC LIMIT 1").get() as any)?.last_seen_at ?? null,
   });
@@ -124,7 +200,21 @@ app.post("/api/discovery/scan", async c => {
         .run(generateId(), items.length, added.length, removed.length,
           JSON.stringify(added.slice(0, 50)), JSON.stringify(removed.slice(0, 50)));
     }
-    return c.json({ count: items.length, added: added.length, removed: removed.length, items: items.slice(0, 5) });
+    let automationsLoaded = 0;
+    try {
+      automationsLoaded = syncAutomationsFromSnapshot().count;
+    } catch (automationError) {
+      const message = automationError instanceof Error ? automationError.message : String(automationError);
+      automationSyncState.lastError = message;
+    }
+
+    return c.json({
+      count: items.length,
+      added: added.length,
+      removed: removed.length,
+      items: items.slice(0, 5),
+      automationsLoaded,
+    });
   } catch (e: any) {
     return c.json({ error: e.message }, 500);
   }
@@ -134,7 +224,8 @@ app.post("/api/discovery/scan", async c => {
 app.post("/api/sites/sync", c => {
   try {
     const result = syncZoSitesToServices();
-    return c.json({ ok: true, added: result.added, total: result.total });
+    const spaceResult = syncSpaceRoutesFromSnapshot();
+    return c.json({ ok: true, added: [...result.added, ...spaceResult.added], total: result.total + spaceResult.total });
   } catch (e: any) {
     return c.json({ error: e.message }, 500);
   }
@@ -215,85 +306,10 @@ app.post("/api/services/:id/restart", async c => {
   }
 });
 
-// ── RUNS ─────────────────────────────────────────────────────────
-app.get("/api/runs", c => {
-  const { workflowId, status, limit = "50" } = c.req.query();
-  let query = "SELECT * FROM workflow_runs WHERE 1=1";
-  const params: any[] = [];
-  if (workflowId) { query += " AND workflow_id=?"; params.push(workflowId); }
-  if (status) { query += " AND status=?"; params.push(status); }
-  query += " ORDER BY created_at DESC LIMIT ?";
-  params.push(parseInt(limit));
-  return c.json(db.prepare(query).all(...params));
-});
-
-app.post("/api/runs", async c => {
-  const body = await c.req.json();
-  const id = generateId();
-  const wf = body.workflow_id && hasWorkflowsTable()
-    ? db.prepare("SELECT name FROM workflows WHERE id=?").get(body.workflow_id) as any
-    : null;
-  const workflowName = wf?.name || body.workflow_name || "Unknown";
-  upsertWorkflow(body.workflow_id || null, workflowName);
-  const runStatus = body.status || "pending";
-  db.prepare(`INSERT INTO workflow_runs (id,workflow_id,workflow_name,input_prompt,output,summary,status,review_status,notes,started_at,completed_at,created_at)
-    VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`).run(
-    id, body.workflow_id, workflowName,
-    body.input_prompt || null, body.output || null, body.summary || null,
-    runStatus, body.review_status || "pending",
-    body.notes || null, body.started_at || now(),
-    runStatus === "completed" ? now() : null, now());
-  return c.json({ id, ...body }, 201);
-});
-
-app.get("/api/runs/:id", c => {
-  const run = db.prepare("SELECT * FROM workflow_runs WHERE id=?").get(c.req.param("id"));
-  if (!run) return c.json({ error: "Not found" }, 404);
-  return c.json(run);
-});
-
-app.patch("/api/runs/:id", async c => {
-  const id = c.req.param("id");
-  const body = await c.req.json();
-  const existing = db.prepare("SELECT * FROM workflow_runs WHERE id=?").get(id) as any;
-  if (!existing) return c.json({ error: "Not found" }, 404);
-
-  const fields: string[] = [];
-  const vals: any[] = [];
-  const allowed = ["output", "summary", "status", "review_status", "notes", "reviewer_notes", "error", "duration_ms", "completed_at"];
-  for (const f of allowed) {
-    if (f in body) { fields.push(`${f}=?`); vals.push(body[f]); }
-  }
-  if (body.status === "completed" && !existing.completed_at) {
-    fields.push("completed_at=?"); vals.push(now());
-  }
-  if (body.review_status && body.review_status !== "pending") {
-    fields.push("reviewed_at=?"); vals.push(now());
-  }
-  if (fields.length > 0) {
-    db.prepare(`UPDATE workflow_runs SET ${fields.join(",")} WHERE id=?`).run(...vals, id);
-  }
-
-  // Auto-update workflow stats
-  if ((body.status === "completed" || body.status === "failed") && existing.workflow_id && hasWorkflowsTable()) {
-    const runs = db.prepare("SELECT status FROM workflow_runs WHERE workflow_id=?").all(existing.workflow_id) as any[];
-    const completed = runs.filter(r => r.status === "completed").length;
-    const failed = runs.filter(r => r.status === "failed").length;
-    const rate = runs.length > 0 ? completed / runs.length : 0;
-    const lastSuccessAt = body.status === "completed" ? now() : null;
-    db.prepare("UPDATE workflows SET failure_count=?,success_rate=?,last_run_at=?,last_success_at=?,updated_at=? WHERE id=?")
-      .run(failed, rate, now(), lastSuccessAt, now(), existing.workflow_id);
-  }
-
-  return c.json({ id, ...body });
-});
-
 // ── NEEDS REVIEW ─────────────────────────────────────────────────
 app.get("/api/reviews", c => {
   const items = db.prepare("SELECT * FROM review_items WHERE status='pending' ORDER BY priority DESC, created_at ASC").all();
-  const runItems = db.prepare("SELECT * FROM workflow_runs WHERE status IN ('needs_review','failed') AND (review_status='pending' OR review_status IS NULL) ORDER BY created_at DESC").all() as any[];
-
-  return c.json({ reviewItems: items, needsReviewRuns: runItems });
+  return c.json({ reviewItems: items });
 });
 
 app.patch("/api/reviews/:id", async c => {
@@ -319,24 +335,35 @@ app.get("/api/automations", c => {
   return c.json(automations);
 });
 
-// Calendar: past 14 days of actual runs + future scheduled runs
+app.get("/api/automations/status", c => {
+  const count = (db.prepare("SELECT COUNT(*) as c FROM zo_automations").get() as { c: number } | null)?.c ?? 0;
+  return c.json({ ...automationSyncState, count });
+});
+
+app.post("/api/automations/refresh", async c => {
+  try {
+    const result = syncAutomationsFromSnapshot();
+    automationSyncState.lastSyncAt = now();
+    automationSyncState.lastError = null;
+    automationSyncState.lastCount = result.count;
+    automationSyncState.lastRemoved = 0;
+    automationSyncState.lastPartial = false;
+    automationSyncState.lastExistingCount = result.count;
+    return c.json({ ok: true, started: false, completed: true, ...result });
+  } catch (e: any) {
+    automationSyncState.lastError = e.message;
+    return c.json({ error: e.message }, 500);
+  }
+});
+
+app.post("/api/automations/deep-refresh", async c => {
+  return c.json({ ok: true, started: queueAutomationSync() });
+});
+
+// Calendar: future scheduled automations
 app.get("/api/automations/calendar", c => {
   const automations = db.prepare("SELECT * FROM zo_automations ORDER BY title ASC").all() as any[];
-  const pastRuns = db.prepare(`
-    SELECT workflow_name, status, id, DATE(created_at) as run_date
-    FROM workflow_runs
-    WHERE created_at >= datetime('now', '-14 days')
-    ORDER BY created_at DESC
-  `).all() as any[];
-
-  // Group past runs by date
-  const byDate: Record<string, { workflow_name: string; status: string; id: string }[]> = {};
-  for (const r of pastRuns) {
-    if (!byDate[r.run_date]) byDate[r.run_date] = [];
-    byDate[r.run_date].push({ workflow_name: r.workflow_name, status: r.status, id: r.id });
-  }
-
-  return c.json({ automations, runsByDate: byDate });
+  return c.json({ automations });
 });
 
 app.get("/api/automations/:id", c => {
@@ -345,18 +372,10 @@ app.get("/api/automations/:id", c => {
   return c.json(a);
 });
 
-// Recent run history for one automation (matched by title)
 app.get("/api/automations/:id/history", c => {
   const automation = db.prepare("SELECT * FROM zo_automations WHERE id=?").get(c.req.param("id")) as any;
   if (!automation) return c.json({ error: "Not found" }, 404);
-  const runs = db.prepare(`
-    SELECT id, status, summary, output, created_at, completed_at
-    FROM workflow_runs
-    WHERE workflow_name = ?
-    ORDER BY created_at DESC
-    LIMIT 20
-  `).all(automation.title) as any[];
-  return c.json({ automation, runs });
+  return c.json({ automation });
 });
 
 // Update user_notes for an automation
@@ -476,21 +495,7 @@ app.get("/api/changelog", c => {
 
 // ── FEED (intelligence output) ────────────────────────────────────
 app.get("/api/feed", c => {
-  const { limit = "50", workflowId, search } = c.req.query();
-  let query = "SELECT * FROM workflow_runs WHERE output IS NOT NULL AND output != ''";
-  const params: any[] = [];
-  if (workflowId) { query += " AND workflow_id=?"; params.push(workflowId); }
-  if (search) {
-    query += " AND (output LIKE ? OR workflow_name LIKE ? OR summary LIKE ?)";
-    const s = `%${search}%`; params.push(s, s, s);
-  }
-  query += " ORDER BY created_at DESC LIMIT ?";
-  params.push(Math.min(parseInt(limit), 200));
-  const runs = db.prepare(query).all(...params) as any[];
-  const workflows = db.prepare(
-    "SELECT DISTINCT workflow_id, workflow_name FROM workflow_runs WHERE output IS NOT NULL AND output != '' ORDER BY workflow_name"
-  ).all() as any[];
-  return c.json({ runs, workflows });
+  return c.json({ runs: [], workflows: [] });
 });
 
 // ── LOGS ──────────────────────────────────────────────────────────

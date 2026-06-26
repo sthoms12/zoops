@@ -1,7 +1,7 @@
 import { BrowserRouter, Route, Routes, Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import {
-  LayoutDashboard, Search, Server, Play,
+  LayoutDashboard, Search, Server,
   Brain, Activity, Settings as SettingsIcon, Zap, Menu, X,
   Rss, Terminal, Database, GitCompare, Globe, Calendar as CalendarIcon, Inbox,
 } from "lucide-react";
@@ -13,8 +13,6 @@ import CommandCenter from "@/pages/CommandCenter";
 import DiscoveryPage from "@/pages/Discovery";
 import ServicesPage from "@/pages/Services";
 import SitesPage from "@/pages/Sites";
-import RunsPage from "@/pages/Runs";
-import RunDetail from "@/pages/RunDetail";
 import SkillsPersonas from "@/pages/SkillsPersonas";
 import HealthPage from "@/pages/Health";
 import SettingsPage from "@/pages/Settings";
@@ -57,7 +55,6 @@ const navGroups: NavGroup[] = [
       { to: "/services", icon: <Server size={15} />, label: "Services" },
       { to: "/automations", icon: <Zap size={15} />, label: "Automations" },
       { to: "/calendar", icon: <CalendarIcon size={15} />, label: "Schedule" },
-      { to: "/runs", icon: <Play size={15} />, label: "Runs" },
       { to: "/review", icon: <Inbox size={15} />, label: "Review Queue" },
     ],
   },
@@ -254,8 +251,6 @@ function AppShell() {
             <Route path="/automations" element={<ErrorBoundary label="Automations"><AutomationsPage /></ErrorBoundary>} />
             <Route path="/automations/:id" element={<ErrorBoundary label="Automation Detail"><AutomationDetail /></ErrorBoundary>} />
             <Route path="/calendar" element={<ErrorBoundary label="Schedule"><AutomationCalendarPage /></ErrorBoundary>} />
-            <Route path="/runs" element={<ErrorBoundary label="Runs"><RunsPage /></ErrorBoundary>} />
-            <Route path="/runs/:id" element={<ErrorBoundary label="Run Detail"><RunDetail /></ErrorBoundary>} />
             <Route path="/feed" element={<ErrorBoundary label="Intelligence Feed"><FeedPage /></ErrorBoundary>} />
             <Route path="/logs" element={<ErrorBoundary label="Logs"><LogsPage /></ErrorBoundary>} />
             <Route path="/explorer" element={<ErrorBoundary label="DB Explorer"><ExplorerPage /></ErrorBoundary>} />

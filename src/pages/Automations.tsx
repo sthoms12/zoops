@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Clock, Calendar, Mail, CheckCircle, PauseCircle, Pencil, Check, X, ChevronRight } from "lucide-react";
+import { Clock, Calendar, Mail, CheckCircle, PauseCircle, Pencil, Check, X, ChevronRight, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { fmtRelative } from "@/lib/utils";
 
@@ -142,6 +142,7 @@ function AutomationCard({ automation, onSaveNotes }: { automation: Automation; o
 export default function AutomationsPage() {
   const [automations, setAutomations] = useState<Automation[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   async function load(silent = false) {
     if (!silent) setLoading(true);
@@ -173,7 +174,56 @@ export default function AutomationsPage() {
     }
   }
 
+  async function refresh() {
+    setRefreshing(true);
+    try {
+      const res = await fetch("/api/automations/deep-refresh", { method: "POST" });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      if (!data.started) {
+        toast.message("Automation sync is already running");
+      }
+
+      const startedAt = Date.now();
+      let finished = false;
+
+      while (Date.now() - startedAt < 180000) {
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+        const statusRes = await fetch("/api/automations/status");
+        if (!statusRes.ok) continue;
+        const status = await statusRes.json();
+        if (!status.syncing) {
+          finished = true;
+          await load(true);
+          if (status.lastError) {
+            throw new Error(status.lastError);
+          }
+          if (status.lastPartial) {
+            toast.warning(`Partial sync returned ${status.lastCount ?? 0} of ${status.lastExistingCount ?? status.count ?? 0}; kept existing cached rows`);
+          } else {
+            toast.success(`Synced ${status.lastCount ?? status.count ?? 0} automations`);
+          }
+          break;
+        }
+      }
+
+      if (!finished) {
+        toast.message("Automation sync is still running in the background");
+      }
+    } catch (e: any) {
+      toast.error(`Failed to refresh automations: ${e.message}`);
+    } finally {
+      setRefreshing(false);
+    }
+  }
+
   useEffect(() => { load(); }, []);
+
+  // Silently reload every 3 minutes to pick up background syncs
+  useEffect(() => {
+    const interval = setInterval(() => load(true), 3 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const active = automations.filter(a => a.active);
   const paused = automations.filter(a => !a.active);
@@ -187,6 +237,14 @@ export default function AutomationsPage() {
             {loading ? "Loading…" : `${automations.length} scheduled agents · ${active.length} active`}
           </p>
         </div>
+        <button
+          onClick={refresh}
+          disabled={refreshing}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md border border-border bg-card hover:bg-secondary text-muted-foreground hover:text-foreground disabled:opacity-50"
+        >
+          <RefreshCw size={14} className={refreshing ? "animate-spin" : ""} />
+          Refresh
+        </button>
       </div>
 
       {loading ? (

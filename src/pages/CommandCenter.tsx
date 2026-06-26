@@ -1,19 +1,17 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { RefreshCw, AlertTriangle, CheckCircle2, Clock, XCircle, ChevronRight, Activity, Inbox } from "lucide-react";
-import { cn, fmtRelative, STATUS_COLORS, statusLabel } from "@/lib/utils";
+import { RefreshCw, AlertTriangle, ChevronRight, Activity, Inbox, Zap, Clock } from "lucide-react";
+import { cn, fmtRelative } from "@/lib/utils";
 import { toast } from "sonner";
 
 interface DashboardData {
   stats: {
-    failedRuns: number;
-    successRate: number;
-    totalRuns: number;
+    automationsCount: number;
     liveSites: number;
     discoveredCount: number;
   };
   healthWarnings: string[];
-  recentRuns: any[];
+  recentAutomations: any[];
   latestHealth: any;
   lastScanAt: string | null;
 }
@@ -43,49 +41,39 @@ function StatCard({ label, value, sub, color = "default", to }: { label: string;
   return to ? <Link to={to}>{content}</Link> : content;
 }
 
-function RunStatusIcon({ status }: { status: string }) {
-  switch (status) {
-    case "completed": return <CheckCircle2 size={14} className="text-emerald-400 shrink-0" />;
-    case "failed": return <XCircle size={14} className="text-red-400 shrink-0" />;
-    case "needs_review": return <AlertTriangle size={14} className="text-orange-400 shrink-0" />;
-    default: return <Clock size={14} className="text-zinc-400 shrink-0" />;
-  }
-}
-
 export default function CommandCenter({ onRefresh }: { onRefresh: () => void }) {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
 
-  useEffect(() => { loadData(); }, []);
+  useEffect(() => {
+    loadData();
+    const interval = setInterval(() => loadData(true), 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
 
-  async function loadData() {
-    setLoading(true);
-    setLoadError(false);
+  async function loadData(quiet = false) {
+    if (!quiet) { setLoading(true); setLoadError(false); }
     try {
       const res = await fetch("/api/dashboard");
       if (res.ok) {
         const dashboardData = await res.json();
-        // Load latest cached health from history instead of making a live check
         try {
           const healthRes = await fetch("/api/health/history");
           if (healthRes.ok) {
             const history = await healthRes.json();
-            if (history.length > 0) {
-              dashboardData.latestHealth = history[0];
-            }
+            if (history.length > 0) dashboardData.latestHealth = history[0];
           }
         } catch {}
         setData(dashboardData);
-      } else {
+      } else if (!quiet) {
         setLoadError(true);
         toast.error("Failed to load dashboard");
       }
     } catch {
-      setLoadError(true);
-      toast.error("Failed to load dashboard");
+      if (!quiet) { setLoadError(true); toast.error("Failed to load dashboard"); }
     }
-    finally { setLoading(false); }
+    finally { if (!quiet) setLoading(false); }
   }
 
   async function triggerScan() {
@@ -116,7 +104,7 @@ export default function CommandCenter({ onRefresh }: { onRefresh: () => void }) 
     </div>
   );
 
-  const { stats, healthWarnings, recentRuns, latestHealth } = data;
+  const { stats, healthWarnings, recentAutomations, latestHealth } = data;
   const healthColor = latestHealth?.overall_status === "healthy" ? "text-emerald-400" :
     latestHealth?.overall_status === "warning" ? "text-yellow-400" : "text-red-400";
 
@@ -161,36 +149,34 @@ export default function CommandCenter({ onRefresh }: { onRefresh: () => void }) 
       )}
 
       {/* Stats grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <StatCard label="Failed Runs" value={stats.failedRuns} to="/runs" color={stats.failedRuns > 0 ? "red" : "green"} sub={`of ${stats.totalRuns} total`} />
-        <StatCard label="Run Success Rate" value={`${stats.successRate}%`} color={stats.successRate >= 80 ? "green" : stats.successRate >= 50 ? "yellow" : "red"} />
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+        <StatCard label="Active Automations" value={stats.automationsCount} to="/automations" color="blue" />
         <StatCard label="Sites & Services" value={stats.liveSites} to="/sites" color="blue" />
         <StatCard label="Discovered Items" value={stats.discoveredCount} to="/discovery" color="blue" />
       </div>
 
       {/* Two-column section */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Recent runs */}
+        {/* Upcoming automations */}
         <div className="bg-card border border-border rounded-lg">
           <div className="flex items-center justify-between px-4 py-3 border-b border-border">
             <div className="flex items-center gap-2">
-              <Activity size={14} className="text-muted-foreground" />
-              <span className="text-sm font-medium">Recent Runs</span>
+              <Zap size={14} className="text-muted-foreground" />
+              <span className="text-sm font-medium">Upcoming Automations</span>
             </div>
-            <Link to="/runs" className="text-xs text-muted-foreground hover:text-foreground transition-colors">View all →</Link>
+            <Link to="/automations" className="text-xs text-muted-foreground hover:text-foreground transition-colors">View all →</Link>
           </div>
           <div className="divide-y divide-border">
-            {recentRuns.length === 0 && (
-              <p className="text-sm text-muted-foreground p-4">No runs yet</p>
+            {recentAutomations.length === 0 && (
+              <p className="text-sm text-muted-foreground p-4">No automations found</p>
             )}
-            {recentRuns.slice(0, 6).map((run: any) => (
-              <Link key={run.id} to={`/runs/${run.id}`} className="flex items-center gap-3 px-4 py-2.5 hover:bg-white/5 transition-colors">
-                <RunStatusIcon status={run.status} />
+            {recentAutomations.map((a: any) => (
+              <Link key={a.id} to={`/automations/${a.id}`} className="flex items-center gap-3 px-4 py-2.5 hover:bg-white/5 transition-colors">
+                <Zap size={12} className={cn("shrink-0", a.active ? "text-emerald-400" : "text-zinc-600")} />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm truncate font-medium">{run.workflow_name}</p>
-                  <p className="text-xs text-muted-foreground">{fmtRelative(run.created_at)}</p>
+                  <p className="text-sm truncate font-medium">{a.title}</p>
+                  {a.next_run && <p className="text-xs text-muted-foreground flex items-center gap-1"><Clock size={10} /> {fmtRelative(a.next_run)}</p>}
                 </div>
-                <span className={cn("status-badge border", STATUS_COLORS[run.status] || STATUS_COLORS.pending)}>{statusLabel(run.status)}</span>
               </Link>
             ))}
           </div>

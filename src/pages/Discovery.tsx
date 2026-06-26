@@ -83,15 +83,19 @@ export default function DiscoveryPage() {
   const [filter, setFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
 
-  useEffect(() => { loadItems(); }, []);
+  useEffect(() => {
+    loadItems();
+    const interval = setInterval(() => loadItems(true), 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
 
-  async function loadItems() {
-    setLoading(true);
+  async function loadItems(quiet = false) {
+    if (!quiet) setLoading(true);
     try {
       const res = await fetch("/api/discovery");
       if (res.ok) setItems(await res.json() as DiscoveryItem[]);
-    } catch { toast.error("Failed to load discovery items"); }
-    finally { setLoading(false); }
+    } catch { if (!quiet) toast.error("Failed to load discovery items"); }
+    finally { if (!quiet) setLoading(false); }
   }
 
   async function runScan() {
