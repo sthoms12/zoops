@@ -2,6 +2,7 @@ import { db, generateId, now } from "./db";
 import { detectServicesFromLogs } from "./discovery";
 import { readFileSync, existsSync } from "fs";
 import { join } from "path";
+import { getRuntimePort } from "./settings";
 
 export function seedIfEmpty() {
   const count = (db.prepare("SELECT COUNT(*) as c FROM services").get() as { c: number })?.c ?? 0;
@@ -13,8 +14,9 @@ export function seedIfEmpty() {
     (id,name,path,type,status,endpoint,port,last_checked_at,notes,is_auto_detected,created_at,updated_at)
     VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`);
 
+  const runtimePort = getRuntimePort();
   const knownEndpoints: Record<string, { port?: number; endpoint?: string; type: string }> = {
-    "zoops": { port: 56874, type: "zo-site" },
+    "zoops": { port: runtimePort, type: "zo-site" },
   };
 
   for (const svc of detectedServices) {
@@ -32,7 +34,7 @@ export function seedIfEmpty() {
   // Add ZoOps itself if not detected from logs
   if (!detectedServices.find(s => s.name === "zoops")) {
     insertSvc.run("zoops", "zoops", "/home/workspace/zoops", "zo-site",
-      "healthy", null, 56874, now(),
+      "healthy", null, runtimePort, now(),
       "ZoOps — Zo-native management plane", 0, now(), now());
   }
 
@@ -105,5 +107,5 @@ export function seedIfEmpty() {
     insertSetting.run(k, v, now());
   }
 
-  console.log("ZoOps: seed complete — all data from live sources, zero fabrication");
+  console.log("ZoOps: seed complete — live data where available, generic examples only as fallback");
 }

@@ -13,6 +13,18 @@ db.run("PRAGMA synchronous=NORMAL");
 db.run("PRAGMA busy_timeout=5000");
 
 export function initDb() {
+  db.run(`CREATE TABLE IF NOT EXISTS workflows (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    status TEXT DEFAULT 'unknown',
+    failure_count INTEGER DEFAULT 0,
+    success_rate REAL DEFAULT 0,
+    last_run_at TEXT,
+    last_success_at TEXT,
+    created_at TEXT DEFAULT (datetime('now')),
+    updated_at TEXT DEFAULT (datetime('now'))
+  )`);
+
   db.run(`CREATE TABLE IF NOT EXISTS workflow_runs (
     id TEXT PRIMARY KEY,
     workflow_id TEXT,

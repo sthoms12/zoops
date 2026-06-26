@@ -14,6 +14,11 @@ interface Service {
   last_checked_at: string;
 }
 
+function getPublishLabel(notes: string | null): string | null {
+  const match = notes?.match(/ · label ([^·]+)$/);
+  return match?.[1]?.trim() || null;
+}
+
 const TYPE_ICONS: Record<string, React.ReactNode> = {
   "zo-site": <Globe size={20} className="text-blue-400" />,
   "zo-space": <Globe size={20} className="text-purple-400" />,
@@ -46,6 +51,8 @@ function StatusIcon({ status }: { status: string }) {
 
 function SiteCard({ svc, onCheck, checking }: { svc: Service; onCheck: (id: string) => void; checking: boolean }) {
   const url = svc.endpoint || null;
+  const publishLabel = getPublishLabel(svc.notes);
+  const hasPublishConfig = svc.type === "zo-site" && !!publishLabel;
 
   return (
     <div className="rounded-lg border border-border bg-card overflow-hidden hover:border-primary/30 transition-colors">
@@ -62,6 +69,10 @@ function SiteCard({ svc, onCheck, checking }: { svc: Service; onCheck: (id: stri
           <div className={cn("absolute top-2 right-2 rounded-full p-1 border", STATUS_COLORS[svc.status] || STATUS_COLORS.unknown)}>
             <StatusIcon status={svc.status} />
           </div>
+        ) : hasPublishConfig ? (
+          <span className="absolute top-2 right-2 text-[10px] px-1.5 py-0.5 rounded bg-blue-500/10 border border-blue-500/20 text-blue-400">
+            Configured
+          </span>
         ) : (
           <span className="absolute top-2 right-2 text-[10px] px-1.5 py-0.5 rounded bg-muted border border-border text-muted-foreground">Unpublished</span>
         )}
@@ -77,6 +88,9 @@ function SiteCard({ svc, onCheck, checking }: { svc: Service; onCheck: (id: stri
             <span>·</span>
             <span>{fmtRelative(svc.last_checked_at)}</span>
           </div>
+          {publishLabel && !url && (
+            <p className="text-[11px] text-blue-400 mt-1 truncate">Publish label: {publishLabel}</p>
+          )}
         </div>
         <div className="flex gap-2">
           {url && (
@@ -178,6 +192,7 @@ export default function SitesPage() {
   }
 
   const published = services.filter(s => !!s.endpoint).length;
+  const configured = services.filter(s => !s.endpoint && s.type === "zo-site" && !!getPublishLabel(s.notes)).length;
   const total = services.length;
 
   return (
@@ -186,7 +201,7 @@ export default function SitesPage() {
         <div>
           <h1 className="text-2xl font-semibold">Sites & Services</h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            {loading ? "Loading…" : `${total} total · ${published} published`}
+            {loading ? "Loading…" : `${total} total · ${published} published${configured > 0 ? ` · ${configured} configured` : ""}`}
           </p>
         </div>
         <div className="flex gap-2">

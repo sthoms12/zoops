@@ -2,8 +2,8 @@ import { execSync } from "child_process";
 import { existsSync, readdirSync, statSync, readFileSync } from "fs";
 import { join, dirname, basename } from "path";
 import { db, generateId, now } from "./db";
+import { getWorkspaceRoots } from "./settings";
 
-const WORKSPACE = "/home/workspace";
 const SECRET_PATTERNS = /key|token|secret|password|pass|pwd|auth|bearer|credential/i;
 
 export interface DiscoveredItem {
@@ -78,9 +78,20 @@ function maskSecrets(obj: Record<string, unknown>): Record<string, unknown> {
   return out;
 }
 
+function runCommand(commands: string[], timeout = 3000): string {
+  for (const command of commands) {
+    try {
+      const output = execSync(command, { timeout, stdio: ["pipe", "pipe", "pipe"] }).toString().trim();
+      if (output) return output;
+    } catch {}
+  }
+  return "";
+}
+
 export function runDiscovery(): DiscoveredItem[] {
   const items: DiscoveredItem[] = [];
   const seenPaths = new Set<string>();
+  const workspaceRoots = getWorkspaceRoots();
 
   function addItem(type: string, name: string, path: string, description: string, metadata: Record<string, unknown> = {}) {
     if (seenPaths.has(path)) return;
@@ -98,10 +109,10 @@ export function runDiscovery(): DiscoveredItem[] {
   }
 
   // Discover Zo Sites (zosite.json)
-  const zosites = findFiles(WORKSPACE, "zosite.json");
+  const zosites = workspaceRoots.flatMap(root => findFiles(root, "zosite.json"));
   for (const p of zosites) {
     try {
-      const cfg = JSON.parse(safeRead(p));
+      const cfg = JSON.parse(safeRead(p, 64 * 1024));
       const dir = dirname(p);
       const name = cfg.name || basename(dir);
       addItem("zo-site", name, dir, `Zo Site: port ${cfg.local_port || "?"}`, {
@@ -113,11 +124,11 @@ export function runDiscovery(): DiscoveredItem[] {
   }
 
   // Discover Node/Bun projects (package.json)
-  const pkgFiles = findFiles(WORKSPACE, "package.json");
+  const pkgFiles = workspaceRoots.flatMap(root => findFiles(root, "package.json"));
   for (const p of pkgFiles) {
     const dir = dirname(p);
     try {
-      const pkg = JSON.parse(safeRead(p));
+      const pkg = JSON.parse(safeRead(p, 64 * 1024));
       const hasSite = zosites.some(z => dirname(z) === dir);
       if (!hasSite) {
         addItem("node-project", pkg.name || basename(dir), dir, pkg.description || "Node/Bun project", {
@@ -129,7 +140,7 @@ export function runDiscovery(): DiscoveredItem[] {
   }
 
   // Discover Python projects
-  const reqFiles = findFiles(WORKSPACE, "requirements.txt");
+  const reqFiles = workspaceRoots.flatMap(root => findFiles(root, "requirements.txt"));
   for (const p of reqFiles) {
     const dir = dirname(p);
     const content = safeRead(p, 500);
@@ -139,7 +150,7 @@ export function runDiscovery(): DiscoveredItem[] {
   }
 
   // Discover SQLite databases
-  const dbFiles = findByExtension(WORKSPACE, [".db", ".sqlite", ".sqlite3"], 4);
+  const dbFiles = workspaceRoots.flatMap(root => findByExtension(root, [".db", ".sqlite", ".sqlite3"], 4));
   for (const p of dbFiles) {
     const s = safeStat(p);
     const sizeMB = s ? (s.size / 1024 / 1024).toFixed(2) : "?";
@@ -149,7 +160,7 @@ export function runDiscovery(): DiscoveredItem[] {
   }
 
   // Discover Skills
-  const skillFiles = findFiles(join(WORKSPACE, "Skills"), "SKILL.md", 2);
+  const skillFiles = workspaceRoots.flatMap(root => findFiles(join(root, "Skills"), "SKILL.md", 2));
   for (const p of skillFiles) {
     const content = safeRead(p, 1000);
     const nameMatch = content.match(/^name:\s*(.+)$/m);
@@ -160,7 +171,7 @@ export function runDiscovery(): DiscoveredItem[] {
   }
 
   // Discover README files (project docs)
-  const readmes = findFiles(WORKSPACE, "README.md", 2);
+  const readmes = workspaceRoots.flatMap(root => findFiles(root, "README.md", 2));
   for (const p of readmes) {
     const dir = dirname(p);
     // Skip if already discovered as another type
@@ -172,7 +183,7 @@ export function runDiscovery(): DiscoveredItem[] {
   }
 
   // Discover env/config files (mask values)
-  const envFiles = findByExtension(WORKSPACE, [".env", ".env.local", ".env.example"], 3);
+  const envFiles = workspaceRoots.flatMap(root => findByExtension(root, [".env", ".env.local", ".env.example"], 3));
   for (const p of envFiles) {
     if (p.includes("node_modules")) continue;
     const content = safeRead(p, 2000);
@@ -188,24 +199,30 @@ export function runDiscovery(): DiscoveredItem[] {
 
   // Discover recently modified files (last 24h)
   try {
+    const quotedRoots = workspaceRoots.map(root => `"${root}"`).join(" ");
     const output = execSync(
-      `find ${WORKSPACE} -not -path "*/node_modules/*" -not -path "*/.git/*" -not -path "*/Trash/*" -not -path "*/dist/*" -newer /tmp/.zoops_lastcheck -type f 2>/dev/null | head -20`,
+      `find ${quotedRoots} -not -path "*/node_modules/*" -not -path "*/.git/*" -not -path "*/Trash/*" -not -path "*/dist/*" -newer /tmp/.zoops_lastcheck -type f 2>/dev/null | head -20`,
       { timeout: 5000 }
     ).toString().trim();
     execSync("touch /tmp/.zoops_lastcheck", { timeout: 1000 });
     const recentFiles = output.split("\n").filter(Boolean);
     if (recentFiles.length > 0) {
-      addItem("recent-changes", `${recentFiles.length} recently modified files`, WORKSPACE, "Files changed recently", {
-        files: recentFiles.map(f => f.replace(WORKSPACE + "/", "")),
+      addItem("recent-changes", `${recentFiles.length} recently modified files`, workspaceRoots[0], "Files changed recently", {
+        files: recentFiles.map(f => {
+          const root = workspaceRoots.find(candidate => f.startsWith(candidate + "/"));
+          return root ? f.replace(root + "/", "") : f;
+        }),
       });
     }
   } catch {}
 
   // Discover running ports/listeners (safe read)
   try {
-    const output = execSync("ss -tlnp 2>/dev/null | grep LISTEN | awk '{print $4}' | head -20", {
-      timeout: 3000,
-    }).toString().trim();
+    const output = runCommand([
+      "ss -tln 2>/dev/null | awk 'NR>1 {print $4}' | head -20",
+      "netstat -tln 2>/dev/null | awk 'NR>2 {print $4}' | head -20",
+      "lsof -nP -iTCP -sTCP:LISTEN 2>/dev/null | awk 'NR>1 {print $9}' | head -20",
+    ]);
     const ports = [...new Set(output.split("\n").filter(Boolean).map(l => {
       const m = l.match(/:(\d+)$/);
       return m ? parseInt(m[1]) : null;
@@ -247,21 +264,29 @@ export function persistDiscovery(items: DiscoveredItem[]) {
 }
 
 export function syncZoSitesToServices(): { added: string[]; total: number } {
-  const zosites = findFiles(WORKSPACE, "zosite.json");
-  const insert = db.prepare(`
-    INSERT OR IGNORE INTO services (id, name, type, status, endpoint, port, notes, last_checked_at)
-    VALUES (?, ?, 'zo-site', 'detected', NULL, ?, ?, datetime('now'))
+  const zosites = getWorkspaceRoots().flatMap(root => findFiles(root, "zosite.json"));
+  const upsert = db.prepare(`
+    INSERT INTO services (id, name, type, status, endpoint, port, notes, last_checked_at, updated_at)
+    VALUES (?, ?, 'zo-site', 'detected', NULL, ?, ?, datetime('now'), datetime('now'))
+    ON CONFLICT(id) DO UPDATE SET
+      name=excluded.name,
+      port=excluded.port,
+      notes=excluded.notes,
+      last_checked_at=excluded.last_checked_at,
+      updated_at=excluded.updated_at
   `);
   const added: string[] = [];
   for (const p of zosites) {
     try {
-      const cfg = JSON.parse(safeRead(p));
+      const cfg = JSON.parse(safeRead(p, 64 * 1024));
       const name: string = cfg.name || basename(dirname(p));
       const id = name.replace(/[^a-zA-Z0-9]/g, "_");
-      const port: number | null = cfg.local_port || null;
-      const notes = `Zo Site in ${dirname(p)}`;
-      const result = insert.run(id, name, port, notes);
-      if (result.changes > 0) added.push(name);
+      const port: number | null = cfg.local_port || cfg.publish?.published_port || null;
+      const publishLabel = cfg.publish?.label ? ` · label ${cfg.publish.label}` : "";
+      const notes = `Zo Site in ${dirname(p)}${publishLabel}`;
+      const existing = db.prepare("SELECT id FROM services WHERE id=?").get(id);
+      const result = upsert.run(id, name, port, notes);
+      if (!existing && result.changes > 0) added.push(name);
     } catch {}
   }
   const total = (db.prepare("SELECT COUNT(*) as c FROM services WHERE type='zo-site'").get() as { c: number })?.c ?? 0;

@@ -6,9 +6,26 @@ import { runDiscovery, persistDiscovery, detectServicesFromLogs, syncZoSitesToSe
 import { runHealthCheck } from "./backend-lib/health";
 import { seedIfEmpty } from "./backend-lib/seed";
 import { readdirSync, existsSync } from "fs";
+import { getRuntimePort } from "./backend-lib/settings";
 
 type Mode = "development" | "production";
 const mode: Mode = process.env.NODE_ENV === "production" ? "production" : "development";
+
+const hasWorkflowsTable = () => {
+  const row = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='workflows'").get() as { name?: string } | null;
+  return !!row?.name;
+};
+
+function upsertWorkflow(workflowId: string | null | undefined, workflowName: string | null | undefined) {
+  if (!workflowId || !workflowName || !hasWorkflowsTable()) return;
+  db.prepare(`
+    INSERT INTO workflows (id, name, created_at, updated_at)
+    VALUES (?, ?, ?, ?)
+    ON CONFLICT(id) DO UPDATE SET
+      name=excluded.name,
+      updated_at=excluded.updated_at
+  `).run(workflowId, workflowName, now(), now());
+}
 
 // ── PROCESS STABILITY ────────────────────────────────────────────
 // Log unexpected errors and stay alive rather than crashing the process.
@@ -213,11 +230,15 @@ app.get("/api/runs", c => {
 app.post("/api/runs", async c => {
   const body = await c.req.json();
   const id = generateId();
-  const wf = db.prepare("SELECT name FROM workflows WHERE id=?").get(body.workflow_id) as any;
+  const wf = body.workflow_id && hasWorkflowsTable()
+    ? db.prepare("SELECT name FROM workflows WHERE id=?").get(body.workflow_id) as any
+    : null;
+  const workflowName = wf?.name || body.workflow_name || "Unknown";
+  upsertWorkflow(body.workflow_id || null, workflowName);
   const runStatus = body.status || "pending";
   db.prepare(`INSERT INTO workflow_runs (id,workflow_id,workflow_name,input_prompt,output,summary,status,review_status,notes,started_at,completed_at,created_at)
     VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`).run(
-    id, body.workflow_id, wf?.name || body.workflow_name || "Unknown",
+    id, body.workflow_id, workflowName,
     body.input_prompt || null, body.output || null, body.summary || null,
     runStatus, body.review_status || "pending",
     body.notes || null, body.started_at || now(),
@@ -254,14 +275,14 @@ app.patch("/api/runs/:id", async c => {
   }
 
   // Auto-update workflow stats
-  if (body.status === "completed" || body.status === "failed") {
+  if ((body.status === "completed" || body.status === "failed") && existing.workflow_id && hasWorkflowsTable()) {
     const runs = db.prepare("SELECT status FROM workflow_runs WHERE workflow_id=?").all(existing.workflow_id) as any[];
     const completed = runs.filter(r => r.status === "completed").length;
     const failed = runs.filter(r => r.status === "failed").length;
     const rate = runs.length > 0 ? completed / runs.length : 0;
-    const lastRunAt = body.status === "completed" ? now() : existing.last_run_at;
+    const lastSuccessAt = body.status === "completed" ? now() : null;
     db.prepare("UPDATE workflows SET failure_count=?,success_rate=?,last_run_at=?,last_success_at=?,updated_at=? WHERE id=?")
-      .run(failed, rate, now(), body.status === "completed" ? now() : existing.last_success_at, now(), existing.workflow_id);
+      .run(failed, rate, now(), lastSuccessAt, now(), existing.workflow_id);
   }
 
   return c.json({ id, ...body });
@@ -549,7 +570,7 @@ app.post("/api/explorer/query", async c => {
 
 // ── VITE / STATIC ─────────────────────────────────────────────────
 async function startServer() {
-  const port = config.local_port;
+  const port = getRuntimePort();
 
   if (mode === "development") {
     // Start Vite's own dev server on port+1, then proxy all non-API traffic to it

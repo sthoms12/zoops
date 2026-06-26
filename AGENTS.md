@@ -26,7 +26,7 @@ src/
   App.tsx          BrowserRouter + sidebar shell + nav groups
   styles.css       Tailwind v4 + ZoOps dark theme CSS variables
   lib/utils.ts     cn(), fmtRelative(), STATUS_COLORS, statusLabel()
-  pages/           13 pages (see below)
+  pages/           17 route components (15 top-level screens + detail views)
   components/ui/   shadcn/ui components
 
 data/
@@ -41,13 +41,14 @@ data/
 | `/discovery` | Discovery | Auto-detected workspace items by type |
 | `/changelog` | Changelog | Diff between discovery scans — added/removed items |
 | `/feed` | Intelligence Feed | Run output timeline, searchable, filterable by workflow |
+| `/sites` | Sites & Services | Zo sites, space pages, and published service surfaces |
 | `/services` | Services | Zo services + HTTP health checks |
 | `/automations` | Automations | Zo scheduled agents (synced from Zo API, cached) |
-| `/workflows` | Workflows | CRUD list with health/stale state |
-| `/workflows/:id` | WorkflowDetail | Prompt versions, run history, edit |
+| `/automations/:id` | AutomationDetail | Run history, stats, and notes for one automation |
+| `/calendar` | Schedule | Past actual runs plus upcoming scheduled runs |
 | `/runs` | Runs | All workflow runs, filter by status |
 | `/runs/:id` | RunDetail | Paste output, approve/reject, edit |
-| `/review` | Needs Review | Action items, failed runs, session issues |
+| `/review` | Review Queue | Action items, failed runs, session issues |
 | `/skills-personas` | SkillsPersonas | Catalog of workspace skills + personas |
 | `/health` | Health | Live system check + ZoOps operational checks |
 | `/logs` | Logs | Live tail of /dev/shm/*.log files with severity coloring |

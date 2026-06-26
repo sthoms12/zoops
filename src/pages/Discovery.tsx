@@ -3,6 +3,16 @@ import { RefreshCw, Search, Database, Code2, FileCode, HardDrive, Globe, BookOpe
 import { cn, fmtRelative } from "@/lib/utils";
 import { toast } from "sonner";
 
+interface DiscoveryItem {
+  id: string;
+  type: string;
+  name: string;
+  path?: string | null;
+  description?: string | null;
+  metadata?: Record<string, unknown> | string | null;
+  last_seen_at: string;
+}
+
 const TYPE_ICONS: Record<string, React.ReactNode> = {
   "zo-site": <Globe size={14} className="text-primary" />,
   "zo-services": <Server size={14} className="text-blue-400" />,
@@ -29,9 +39,9 @@ const TYPE_LABELS: Record<string, string> = {
   "network": "Network",
 };
 
-function ItemCard({ item }: { item: any }) {
+function ItemCard({ item }: { item: DiscoveryItem }) {
   const [expanded, setExpanded] = useState(false);
-  let meta: any = {};
+  let meta: Record<string, unknown> = {};
   try { meta = typeof item.metadata === "string" ? JSON.parse(item.metadata || "{}") : (item.metadata || {}); } catch {}
 
   return (
@@ -67,7 +77,7 @@ function ItemCard({ item }: { item: any }) {
 }
 
 export default function DiscoveryPage() {
-  const [items, setItems] = useState<any[]>([]);
+  const [items, setItems] = useState<DiscoveryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [scanning, setScanning] = useState(false);
   const [filter, setFilter] = useState("");
@@ -79,7 +89,7 @@ export default function DiscoveryPage() {
     setLoading(true);
     try {
       const res = await fetch("/api/discovery");
-      if (res.ok) setItems(await res.json());
+      if (res.ok) setItems(await res.json() as DiscoveryItem[]);
     } catch { toast.error("Failed to load discovery items"); }
     finally { setLoading(false); }
   }
@@ -105,11 +115,11 @@ export default function DiscoveryPage() {
     return matchesText && matchesType;
   });
 
-  const byType = filtered.reduce((acc, item) => {
+  const byType = filtered.reduce<Record<string, DiscoveryItem[]>>((acc, item) => {
     if (!acc[item.type]) acc[item.type] = [];
     acc[item.type].push(item);
     return acc;
-  }, {} as Record<string, any[]>);
+  }, {});
 
   return (
     <div className="p-6 space-y-5 max-w-5xl">

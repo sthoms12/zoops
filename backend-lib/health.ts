@@ -1,5 +1,6 @@
 import { execSync } from "child_process";
 import { db, generateId, now } from "./db";
+import { getSettingNumber } from "./settings";
 
 export interface HealthSnapshot {
   id: string;
@@ -19,6 +20,7 @@ export interface HealthSnapshot {
   sqlite_version: string | null;
   failed_runs_24h: number;
   pending_reviews: number;
+  stale_workflows: number;
   service_count: number;
   details: Record<string, unknown>;
 }
@@ -87,6 +89,11 @@ function getRuntimeVersions(): { bun: string | null; node: string | null; sqlite
   return { bun, node, sqlite };
 }
 
+function hasWorkflowsTable(): boolean {
+  const row = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='workflows'").get() as { name?: string } | null;
+  return !!row?.name;
+}
+
 export function runHealthCheck(): HealthSnapshot {
   const uptime = parseUptime();
   const load = parseLoadAvg();
@@ -94,6 +101,11 @@ export function runHealthCheck(): HealthSnapshot {
   const mem = parseMem();
   const procs = parseProcessCount();
   const versions = getRuntimeVersions();
+
+  const diskWarnPercent = getSettingNumber("diskWarningPercent", 70);
+  const memWarnPercent = getSettingNumber("memWarningPercent", 80);
+  const failedRunsWarnCount = getSettingNumber("failedRunsWarningCount", 3);
+  const staleThresholdDays = getSettingNumber("staleThresholdDays", 7);
 
   // App-level metrics
   const failedRuns = (db.prepare(
@@ -108,15 +120,32 @@ export function runHealthCheck(): HealthSnapshot {
     `SELECT COUNT(*) as c FROM review_items WHERE status='pending'`
   ).get() as { c: number })?.c ?? 0;
 
+  const staleWorkflows = hasWorkflowsTable()
+    ? ((db.prepare(
+        `SELECT COUNT(*) as c
+         FROM workflows
+         WHERE last_run_at IS NULL OR last_run_at < datetime('now', ?)`
+      ).get(`-${staleThresholdDays} days`) as { c: number })?.c ?? 0)
+    : 0;
+
   const serviceCount = (db.prepare(
     `SELECT COUNT(*) as c FROM services`
   ).get() as { c: number })?.c ?? 0;
 
   // Determine overall status
   let overall_status: "healthy" | "warning" | "failed" = "healthy";
-  if (failedRuns > 3 || (disk.usedPercent !== null && disk.usedPercent > 90) || (mem.usedPercent !== null && mem.usedPercent > 90)) {
+  if (
+    failedRuns > failedRunsWarnCount ||
+    (disk.usedPercent !== null && disk.usedPercent >= 90) ||
+    (mem.usedPercent !== null && mem.usedPercent >= 90)
+  ) {
     overall_status = "failed";
-  } else if (pendingReviews + totalReviewItems > 0 || (disk.usedPercent !== null && disk.usedPercent > 70)) {
+  } else if (
+    pendingReviews + totalReviewItems > 0 ||
+    staleWorkflows > 0 ||
+    (disk.usedPercent !== null && disk.usedPercent >= diskWarnPercent) ||
+    (mem.usedPercent !== null && mem.usedPercent >= memWarnPercent)
+  ) {
     overall_status = "warning";
   }
 
@@ -138,27 +167,28 @@ export function runHealthCheck(): HealthSnapshot {
     sqlite_version: versions.sqlite,
     failed_runs_24h: failedRuns,
     pending_reviews: pendingReviews + totalReviewItems,
+    stale_workflows: staleWorkflows,
     service_count: serviceCount,
     details: {
       checks: {
         appReachable: true,
         dbReachable: true,
         uptimeOk: uptime !== null,
-        diskOk: disk.usedPercent !== null ? disk.usedPercent < 80 : null,
-        memOk: mem.usedPercent !== null ? mem.usedPercent < 80 : null,
+        diskOk: disk.usedPercent !== null ? disk.usedPercent < diskWarnPercent : null,
+        memOk: mem.usedPercent !== null ? mem.usedPercent < memWarnPercent : null,
       },
     },
   };
 
   // Persist snapshot (keep last 100)
-  db.prepare(`INSERT INTO health_snapshots (id,timestamp,overall_status,uptime_seconds,load_avg,disk_used_percent,disk_used_gb,disk_total_gb,mem_used_mb,mem_total_mb,mem_used_percent,process_count,bun_version,node_version,sqlite_version,failed_runs_24h,pending_reviews,service_count,details)
-    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`).run(
+  db.prepare(`INSERT INTO health_snapshots (id,timestamp,overall_status,uptime_seconds,load_avg,disk_used_percent,disk_used_gb,disk_total_gb,mem_used_mb,mem_total_mb,mem_used_percent,process_count,bun_version,node_version,sqlite_version,failed_runs_24h,pending_reviews,stale_workflows,service_count,details)
+    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`).run(
     snapshot.id, snapshot.timestamp, snapshot.overall_status,
     snapshot.uptime_seconds, snapshot.load_avg,
     snapshot.disk_used_percent, snapshot.disk_used_gb, snapshot.disk_total_gb,
     snapshot.mem_used_mb, snapshot.mem_total_mb, snapshot.mem_used_percent,
     snapshot.process_count, snapshot.bun_version, snapshot.node_version, snapshot.sqlite_version,
-    snapshot.failed_runs_24h, snapshot.pending_reviews, snapshot.service_count,
+    snapshot.failed_runs_24h, snapshot.pending_reviews, snapshot.stale_workflows, snapshot.service_count,
     JSON.stringify(snapshot.details)
   );
 
