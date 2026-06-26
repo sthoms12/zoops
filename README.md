@@ -2,12 +2,12 @@
 
 A personal ops dashboard for [Zo Computer](https://zo.computer) — built by a Zo user, for Zo users.
 
-See what's running on your Zo, tail logs, browse your databases, track automation outputs, and monitor workspace health — all in one place, without needing AI to be active.
+See what's running on your Zo, tail logs, browse your databases, track automations, and monitor workspace health — all in one place, without needing AI to be active.
 
 ---
 
 > **⚠️ Always install as a private service.**
-> ZoOps exposes your workspace files, service logs, database contents, run history, and system metrics. It has no authentication layer of its own — it relies entirely on Zo's private service gating. Never publish it as a public service or expose it on a public port. The install instructions below register it as private by default; don't change that.
+> ZoOps exposes your workspace files, service logs, database contents, and system metrics. It has no authentication layer of its own — it relies entirely on Zo's private service gating. Never publish it as a public service or expose it on a public port. The install instructions below register it as private by default; don't change that.
 
 ---
 
@@ -53,14 +53,11 @@ Then ask your Zo AI:
 
 | Page | What it does |
 |------|-------------|
-| **Command Center** | Stats, health warnings, recent runs, system snapshot |
-| **Intelligence Feed** | Scrollable timeline of automation run outputs, searchable by keyword |
-| **Sites & Services** | Zo sites with port and publish info |
+| **Command Center** | Stats, upcoming automations, and latest health snapshot |
+| **Sites & Services** | Zo sites, zo.space pages, and published service surfaces |
 | **Services** | All registered services with live HTTP health checks |
 | **Automations** | All your scheduled Zo agents — schedule, next run, delivery method |
-| **Schedule** | 28-day calendar view of automation runs — past results and upcoming schedule |
-| **Runs** | Full run history; paste output, add notes, approve/reject |
-| **Review Queue** | Action queue: failed runs and flagged items needing attention |
+| **Schedule** | 14-day calendar view of upcoming automation runs |
 | **Discovery** | Auto-scanned workspace items (sites, DBs, skills, logs) |
 | **Workspace Changelog** | Diff between discovery scans — what was added or removed |
 | **Log Viewer** | Live tail of any `/dev/shm/*.log` service log, with severity coloring |

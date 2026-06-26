@@ -4,8 +4,8 @@ ZoOps is a Zo-native management plane for a Zo Computer workspace.
 It runs as a Zo Site at port **50165** (dev) / **56874** (prod).
 
 ## Purpose
-Manually track, review, and troubleshoot Zo workflows, services, browser tasks,
-prompts, skills, and personas — without requiring AI to be running.
+Monitor and manage your Zo workspace — services, automations, discovered items,
+and system health — without requiring AI to be running.
 
 ## Architecture
 
@@ -26,7 +26,7 @@ src/
   App.tsx          BrowserRouter + sidebar shell + nav groups
   styles.css       Tailwind v4 + ZoOps dark theme CSS variables
   lib/utils.ts     cn(), fmtRelative(), STATUS_COLORS, statusLabel()
-  pages/           17 route components (15 top-level screens + detail views)
+  pages/           13 route components (11 top-level screens + detail views)
   components/ui/   shadcn/ui components
 
 data/
@@ -37,18 +37,14 @@ data/
 
 | Route | Page | Purpose |
 |---|---|---|
-| `/` | Command Center | Stats, warnings, recent runs, health snapshot |
+| `/` | Command Center | Stats, upcoming automations, latest health snapshot |
 | `/discovery` | Discovery | Auto-detected workspace items by type |
 | `/changelog` | Changelog | Diff between discovery scans — added/removed items |
-| `/feed` | Intelligence Feed | Run output timeline, searchable, filterable by workflow |
 | `/sites` | Sites & Services | Zo sites, space pages, and published service surfaces |
 | `/services` | Services | Zo services + HTTP health checks |
 | `/automations` | Automations | Zo scheduled agents cached from `data/automations-snapshot.json` |
-| `/automations/:id` | AutomationDetail | Run history, stats, and notes for one automation |
-| `/calendar` | Schedule | Past actual runs plus upcoming scheduled runs |
-| `/runs` | Runs | All workflow runs, filter by status |
-| `/runs/:id` | RunDetail | Paste output, approve/reject, edit |
-| `/review` | Review Queue | Action items, failed runs, session issues |
+| `/automations/:id` | AutomationDetail | Schedule, delivery method, and notes for one automation |
+| `/calendar` | Schedule | 14-day view of upcoming automation runs |
 | `/skills-personas` | SkillsPersonas | Catalog of workspace skills + personas |
 | `/health` | Health | Live system check + ZoOps operational checks |
 | `/logs` | Logs | Live tail of /dev/shm/*.log files with severity coloring |
@@ -98,8 +94,6 @@ When a user asks you to install ZoOps, follow these exact steps:
 
 ## SQLite Schema (key tables)
 
-- `workflow_runs` — output, summary, status, review_status, reviewer_notes
-- `review_items` — manual action items with priority/status
 - `services` — detected/registered services, endpoint, last health check
 - `skills_personas` — workspace skill/persona catalog
 - `discovered_items` — auto-scan results from discovery engine
@@ -111,8 +105,7 @@ When a user asks you to install ZoOps, follow these exact steps:
 
 ## Key Decisions
 
-- **In-memory → SQLite**: all state is persisted in `data/zoops.db`
+- **SQLite**: all state is persisted in `data/zoops.db`
 - **No Zo API calls**: ZoOps reads the local filesystem directly (no round-trips)
-- **Discovery**: scans `/dev/shm/*.log`, `zosite.json` files, `Skills/`, `.sqlite` files
-- **No auto-run**: workflows are executed manually in Zo chat; output is pasted in
-- **Review queue**: aggregates failed runs + browser session issues + manual items
+- **Discovery**: scans `/dev/shm/*.log`, `zosite.json` files, `Skills/`, `.sqlite` files, zo.space route snapshot
+- **Background refresh**: discovery + services + health snapshots refresh every 5 minutes automatically
