@@ -122,7 +122,6 @@ export default function HealthPage() {
           <div className={cn("text-3xl font-bold", si.color)}>{si.label}</div>
           <div className="flex-1">
             <p className="text-xs text-muted-foreground">Last check: {fmtRelative(snap.timestamp)}</p>
-            {snap.pending_reviews > 0 && <p className="text-xs text-yellow-400 mt-0.5">{snap.pending_reviews} item(s) pending review</p>}
             {snap.stale_workflows > 0 && <p className="text-xs text-blue-400 mt-0.5">{snap.stale_workflows} workflow(s) stale</p>}
           </div>
         </div>
@@ -189,7 +188,6 @@ export default function HealthPage() {
               </div>
               <div className="bg-card border border-border rounded-lg p-4">
                 <h3 className="text-xs font-medium mb-3">Operations</h3>
-                <CheckRow label="Pending review under threshold" ok={snap.pending_reviews <= 5} />
                 <CheckRow label="No stale workflows" ok={snap.stale_workflows === 0} />
                 <CheckRow label="Disk under 80%" ok={snap.disk_used_percent === null ? null : snap.disk_used_percent < 80} />
                 <CheckRow label="Memory under 85%" ok={snap.mem_used_percent === null ? null : snap.mem_used_percent < 85} />
@@ -227,17 +225,16 @@ export default function HealthPage() {
           <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-3">Recent History</h2>
           {/* Desktop table */}
           <div className="hidden md:block border border-border rounded-lg overflow-hidden">
-            <div className="grid grid-cols-[80px_100px_1fr_80px_120px] px-4 py-2 bg-secondary/30 border-b border-border text-xs text-muted-foreground font-medium">
-              <span>Status</span><span>Disk</span><span>Memory</span><span>Reviews</span><span>When</span>
+            <div className="grid grid-cols-[80px_100px_1fr_120px] px-4 py-2 bg-secondary/30 border-b border-border text-xs text-muted-foreground font-medium">
+              <span>Status</span><span>Disk</span><span>Memory</span><span>When</span>
             </div>
             {history.slice(0, 15).map(h => (
-              <div key={h.id} className="grid grid-cols-[80px_100px_1fr_80px_120px] px-4 py-2 border-b border-border text-xs items-center">
+              <div key={h.id} className="grid grid-cols-[80px_100px_1fr_120px] px-4 py-2 border-b border-border text-xs items-center">
                 <span className={cn("font-medium", h.overall_status === "healthy" ? "text-emerald-400" : h.overall_status === "warning" ? "text-yellow-400" : "text-red-400")}>
                   {h.overall_status}
                 </span>
                 <span className="text-muted-foreground font-mono">{h.disk_used_percent !== null ? `${h.disk_used_percent?.toFixed(0)}%` : "—"}</span>
                 <span className="text-muted-foreground font-mono">{h.mem_used_percent !== null ? `${h.mem_used_percent}%` : "—"}</span>
-                <span className="text-muted-foreground">{h.pending_reviews ?? 0}</span>
                 <span className="text-zinc-600">{fmtRelative(h.timestamp)}</span>
               </div>
             ))}
@@ -257,8 +254,6 @@ export default function HealthPage() {
                   <span className="font-mono text-right">{h.disk_used_percent !== null ? `${h.disk_used_percent?.toFixed(0)}%` : "—"}</span>
                   <span className="text-muted-foreground">Memory:</span>
                   <span className="font-mono text-right">{h.mem_used_percent !== null ? `${h.mem_used_percent}%` : "—"}</span>
-                  <span className="text-muted-foreground">Reviews:</span>
-                  <span className="text-right">{h.pending_reviews ?? 0}</span>
                 </div>
               </div>
             ))}

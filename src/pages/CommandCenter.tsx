@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { RefreshCw, AlertTriangle, ChevronRight, Activity, Inbox, Zap, Clock } from "lucide-react";
+import { RefreshCw, AlertTriangle, ChevronRight, Activity, Zap, Clock } from "lucide-react";
 import { cn, fmtRelative } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -219,7 +219,6 @@ export default function CommandCenter({ onRefresh }: { onRefresh: () => void }) 
       {/* Quick links */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
         {[
-          { to: "/review", label: "Review Queue", icon: <Inbox size={13} /> },
           { to: "/health", label: "Run Health Check", icon: <Activity size={13} /> },
         ].map(item => (
           <Link key={item.to} to={item.to} className="flex items-center gap-2 px-3 py-2 rounded-md border border-border bg-card hover:bg-secondary transition-colors text-sm text-muted-foreground hover:text-foreground">

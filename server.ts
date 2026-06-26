@@ -306,29 +306,6 @@ app.post("/api/services/:id/restart", async c => {
   }
 });
 
-// ── NEEDS REVIEW ─────────────────────────────────────────────────
-app.get("/api/reviews", c => {
-  const items = db.prepare("SELECT * FROM review_items WHERE status='pending' ORDER BY priority DESC, created_at ASC").all();
-  return c.json({ reviewItems: items });
-});
-
-app.patch("/api/reviews/:id", async c => {
-  const id = c.req.param("id");
-  const body = await c.req.json();
-  db.prepare("UPDATE review_items SET status=?,notes=?,reviewed_at=? WHERE id=?")
-    .run(body.status || "pending", body.notes || null, body.status !== "pending" ? now() : null, id);
-  return c.json({ id, ...body });
-});
-
-app.post("/api/reviews", async c => {
-  const body = await c.req.json();
-  const id = generateId();
-  db.prepare("INSERT INTO review_items (id,type,ref_id,title,description,status,priority,notes,created_at) VALUES (?,?,?,?,?,?,?,?,?)")
-    .run(id, body.type || "general", body.ref_id || null, body.title, body.description || null,
-      "pending", body.priority || "normal", body.notes || null, now());
-  return c.json({ id, ...body }, 201);
-});
-
 // ── AUTOMATIONS (Zo Agents) ─────────────────────────────────────
 app.get("/api/automations", c => {
   const automations = db.prepare("SELECT * FROM zo_automations ORDER BY next_run ASC").all() as any[];

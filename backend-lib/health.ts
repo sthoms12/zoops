@@ -18,7 +18,6 @@ export interface HealthSnapshot {
   bun_version: string | null;
   node_version: string | null;
   sqlite_version: string | null;
-  pending_reviews: number;
   stale_workflows: number;
   service_count: number;
   details: Record<string, unknown>;
@@ -105,11 +104,6 @@ export function runHealthCheck(): HealthSnapshot {
   const memWarnPercent = getSettingNumber("memWarningPercent", 80);
   const staleThresholdDays = getSettingNumber("staleThresholdDays", 7);
 
-  // App-level metrics
-  const totalReviewItems = (db.prepare(
-    `SELECT COUNT(*) as c FROM review_items WHERE status='pending'`
-  ).get() as { c: number })?.c ?? 0;
-
   const staleWorkflows = hasWorkflowsTable()
     ? ((db.prepare(
         `SELECT COUNT(*) as c
@@ -130,7 +124,6 @@ export function runHealthCheck(): HealthSnapshot {
   ) {
     overall_status = "failed";
   } else if (
-    totalReviewItems > 0 ||
     staleWorkflows > 0 ||
     (disk.usedPercent !== null && disk.usedPercent >= diskWarnPercent) ||
     (mem.usedPercent !== null && mem.usedPercent >= memWarnPercent)
@@ -154,7 +147,6 @@ export function runHealthCheck(): HealthSnapshot {
     bun_version: versions.bun,
     node_version: versions.node,
     sqlite_version: versions.sqlite,
-    pending_reviews: totalReviewItems,
     stale_workflows: staleWorkflows,
     service_count: serviceCount,
     details: {
@@ -176,7 +168,7 @@ export function runHealthCheck(): HealthSnapshot {
     snapshot.disk_used_percent, snapshot.disk_used_gb, snapshot.disk_total_gb,
     snapshot.mem_used_mb, snapshot.mem_total_mb, snapshot.mem_used_percent,
     snapshot.process_count, snapshot.bun_version, snapshot.node_version, snapshot.sqlite_version,
-    0, snapshot.pending_reviews, snapshot.stale_workflows, snapshot.service_count,
+    0, 0, snapshot.stale_workflows, snapshot.service_count,
     JSON.stringify(snapshot.details)
   );
 
