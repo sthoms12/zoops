@@ -96,7 +96,7 @@ function AddServiceModal({ onClose, onAdded }: { onClose: () => void; onAdded: (
           {[
             { label: "Name *", key: "name", placeholder: "my-service" },
             { label: "Endpoint", key: "endpoint", placeholder: "https://..." },
-            { label: "Port", key: "port", placeholder: "51017" },
+            { label: "Port", key: "port", placeholder: "50165" },
             { label: "Notes", key: "notes", placeholder: "Optional notes" },
           ].map(f => (
             <div key={f.key}>
