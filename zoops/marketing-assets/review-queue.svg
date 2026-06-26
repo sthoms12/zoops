@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#111116"/>
+      <stop offset="1" stop-color="#09090b"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#6366f1"/>
+      <stop offset="1" stop-color="#22c55e"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="24" stdDeviation="28" flood-color="#000" flood-opacity="0.38"/>
+    </filter>
+  </defs>
+  <rect width="1400" height="900" fill="url(#bg)"/>
+  <circle cx="1180" cy="120" r="220" fill="#6366f1" opacity="0.08"/>
+  <circle cx="180" cy="780" r="240" fill="#22c55e" opacity="0.06"/>
+
+  <g filter="url(#shadow)">
+    <rect x="95" y="80" width="1210" height="740" rx="22" fill="#131315" stroke="#2a2a31"/>
+    <rect x="95" y="80" width="1210" height="64" rx="22" fill="#18181b"/>
+    <rect x="95" y="122" width="1210" height="22" fill="#18181b"/>
+    <circle cx="130" cy="112" r="8" fill="#3f3f46"/>
+    <circle cx="156" cy="112" r="8" fill="#3f3f46"/>
+    <circle cx="182" cy="112" r="8" fill="#3f3f46"/>
+    <text x="220" y="118" fill="#71717a" font-family="Arial, sans-serif" font-size="18">ZoOps — Review Queue</text>
+  </g>
+
+  <text x="145" y="205" fill="#fafafa" font-family="Arial, sans-serif" font-size="42" font-weight="700">Review Queue</text>
+  <text x="145" y="242" fill="#8b8b94" font-family="Arial, sans-serif" font-size="20">Triage failed runs, flagged outputs, and items that need approval.</text>
+
+  <g>
+    <rect x="145" y="290" width="350" height="116" rx="16" fill="#101013" stroke="#292932"/>
+    <text x="175" y="330" fill="#a1a1aa" font-family="Arial, sans-serif" font-size="17">Open items</text>
+    <text x="175" y="375" fill="#fafafa" font-family="Arial, sans-serif" font-size="44" font-weight="700">4</text>
+    <rect x="375" y="326" width="86" height="32" rx="16" fill="#f59e0b" opacity="0.16"/>
+    <text x="397" y="348" fill="#fbbf24" font-family="Arial, sans-serif" font-size="14" font-weight="700">Needs review</text>
+  </g>
+  <g>
+    <rect x="525" y="290" width="350" height="116" rx="16" fill="#101013" stroke="#292932"/>
+    <text x="555" y="330" fill="#a1a1aa" font-family="Arial, sans-serif" font-size="17">Resolved today</text>
+    <text x="555" y="375" fill="#fafafa" font-family="Arial, sans-serif" font-size="44" font-weight="700">11</text>
+    <rect x="750" y="326" width="92" height="32" rx="16" fill="#22c55e" opacity="0.14"/>
+    <text x="774" y="348" fill="#4ade80" font-family="Arial, sans-serif" font-size="14" font-weight="700">Clean</text>
+  </g>
+  <g>
+    <rect x="905" y="290" width="350" height="116" rx="16" fill="#101013" stroke="#292932"/>
+    <text x="935" y="330" fill="#a1a1aa" font-family="Arial, sans-serif" font-size="17">Oldest item</text>
+    <text x="935" y="375" fill="#fafafa" font-family="Arial, sans-serif" font-size="44" font-weight="700">18m</text>
+    <rect x="1124" y="326" width="96" height="32" rx="16" fill="#6366f1" opacity="0.16"/>
+    <text x="1147" y="348" fill="#a5b4fc" font-family="Arial, sans-serif" font-size="14" font-weight="700">Tracked</text>
+  </g>
+
+  <g>
+    <rect x="145" y="460" width="1110" height="86" rx="16" fill="#101013" stroke="#292932"/>
+    <rect x="170" y="486" width="42" height="42" rx="12" fill="#f59e0b" opacity="0.18"/>
+    <text x="184" y="514" fill="#fbbf24" font-family="Arial, sans-serif" font-size="24">!</text>
+    <text x="235" y="497" fill="#fafafa" font-family="Arial, sans-serif" font-size="20" font-weight="700">Daily collection run needs review</text>
+    <text x="235" y="524" fill="#8b8b94" font-family="Arial, sans-serif" font-size="16">Output flagged for manual approval before archive</text>
+    <rect x="1036" y="483" width="84" height="38" rx="10" fill="#6366f1"/>
+    <text x="1058" y="508" fill="#ffffff" font-family="Arial, sans-serif" font-size="15" font-weight="700">View</text>
+    <rect x="1134" y="483" width="92" height="38" rx="10" fill="#22c55e" opacity="0.88"/>
+    <text x="1155" y="508" fill="#04130a" font-family="Arial, sans-serif" font-size="15" font-weight="700">Resolve</text>
+  </g>
+
+  <g>
+    <rect x="145" y="570" width="1110" height="86" rx="16" fill="#101013" stroke="#292932"/>
+    <rect x="170" y="596" width="42" height="42" rx="12" fill="#ef4444" opacity="0.15"/>
+    <text x="182" y="624" fill="#f87171" font-family="Arial, sans-serif" font-size="24">×</text>
+    <text x="235" y="607" fill="#fafafa" font-family="Arial, sans-serif" font-size="20" font-weight="700">Failed service check</text>
+    <text x="235" y="634" fill="#8b8b94" font-family="Arial, sans-serif" font-size="16">HTTP probe failed twice; review before suppressing</text>
+    <rect x="1036" y="593" width="84" height="38" rx="10" fill="#6366f1"/>
+    <text x="1058" y="618" fill="#ffffff" font-family="Arial, sans-serif" font-size="15" font-weight="700">View</text>
+    <rect x="1134" y="593" width="92" height="38" rx="10" fill="#27272a" stroke="#3f3f46"/>
+    <text x="1152" y="618" fill="#d4d4d8" font-family="Arial, sans-serif" font-size="15" font-weight="700">Approve</text>
+  </g>
+
+  <g>
+    <rect x="145" y="680" width="1110" height="86" rx="16" fill="#101013" stroke="#292932"/>
+    <rect x="170" y="706" width="42" height="42" rx="12" fill="#6366f1" opacity="0.16"/>
+    <text x="181" y="734" fill="#a5b4fc" font-family="Arial, sans-serif" font-size="24">?</text>
+    <text x="235" y="717" fill="#fafafa" font-family="Arial, sans-serif" font-size="20" font-weight="700">Automation output waiting</text>
+    <text x="235" y="744" fill="#8b8b94" font-family="Arial, sans-serif" font-size="16">New summary generated; confirm it should be published</text>
+    <rect x="1036" y="703" width="84" height="38" rx="10" fill="#6366f1"/>
+    <text x="1058" y="728" fill="#ffffff" font-family="Arial, sans-serif" font-size="15" font-weight="700">View</text>
+    <rect x="1134" y="703" width="92" height="38" rx="10" fill="#27272a" stroke="#3f3f46"/>
+    <text x="1152" y="728" fill="#d4d4d8" font-family="Arial, sans-serif" font-size="15" font-weight="700">Approve</text>
+  </g>
+
+  <rect x="145" y="812" width="1110" height="5" rx="2.5" fill="url(#accent)" opacity="0.75"/>
+</svg>

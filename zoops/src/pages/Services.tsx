@@ -19,34 +19,49 @@ function StatusIcon({ status }: { status: string }) {
   }
 }
 
-function ServiceRow({ svc, onCheck, onDelete }: { svc: any; onCheck: (id: string) => void; onDelete: (id: string) => void }) {
+function ServiceRow({ svc, onCheck, onDelete, onRestart, checking, restarting }: { svc: any; onCheck: (id: string) => void; onDelete: (id: string) => void; onRestart: (id: string) => void; checking: boolean; restarting: boolean }) {
   return (
-    <div className="flex items-center gap-4 px-4 py-3 border-b border-border hover:bg-white/5 transition-colors">
-      <StatusIcon status={svc.status} />
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium">{svc.name}</span>
-          <span className="text-[10px] px-1.5 py-0.5 rounded bg-secondary text-muted-foreground">{TYPE_LABELS[svc.type] || svc.type}</span>
-          {svc.is_auto_detected ? (
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400">auto-detected</span>
-          ) : null}
+    <div className="px-4 py-3 border-b border-border hover:bg-white/5 transition-colors">
+      <div className="flex items-start gap-3">
+        <div className="mt-0.5 shrink-0">
+          <StatusIcon status={svc.status} />
         </div>
-        {svc.path && <p className="text-[11px] text-zinc-600 font-mono truncate mt-0.5">{svc.path.replace("/home/workspace/", "workspace/").replace("/dev/shm/", "shm/")}</p>}
-        {svc.notes && <p className="text-xs text-muted-foreground mt-0.5 truncate">{svc.notes}</p>}
-      </div>
-      <div className="flex items-center gap-3 shrink-0">
-        {svc.port && <span className="text-xs text-muted-foreground font-mono">:{svc.port}</span>}
-        {svc.endpoint && (
-          <a href={svc.endpoint} target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground hover:text-primary transition-colors">
-            <ExternalLink size={13} />
-          </a>
-        )}
-        <span className="text-xs text-zinc-600">{fmtRelative(svc.last_checked_at)}</span>
-        <span className={cn("status-badge border", STATUS_COLORS[svc.status] || STATUS_COLORS.unknown)}>{statusLabel(svc.status)}</span>
-        <button onClick={() => onCheck(svc.id)} className="text-xs px-2 py-1 rounded border border-border hover:bg-secondary transition-colors text-muted-foreground">Check</button>
-        {!svc.is_auto_detected && (
-          <button onClick={() => onDelete(svc.id)} className="text-xs px-2 py-1 rounded border border-red-500/20 hover:bg-red-500/10 text-red-400 transition-colors">Remove</button>
-        )}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center flex-wrap gap-1.5">
+            <span className="text-sm font-medium">{svc.name}</span>
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-secondary text-muted-foreground">{TYPE_LABELS[svc.type] || svc.type}</span>
+            {svc.is_auto_detected && (
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400">auto</span>
+            )}
+          </div>
+          {svc.path && <p className="text-[11px] text-zinc-600 font-mono truncate mt-0.5">{svc.path.replace("/home/workspace/", "workspace/").replace("/dev/shm/", "shm/")}</p>}
+          {svc.notes && <p className="text-xs text-muted-foreground mt-0.5 truncate">{svc.notes}</p>}
+          <div className="flex items-center flex-wrap gap-2 mt-2">
+            <span className={cn("status-badge border text-[10px]", STATUS_COLORS[svc.status] || STATUS_COLORS.unknown)}>{statusLabel(svc.status)}</span>
+            {svc.port && <span className="text-xs text-muted-foreground font-mono">:{svc.port}</span>}
+            {svc.endpoint && (
+              <a href={svc.endpoint} target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground hover:text-primary transition-colors flex items-center gap-1">
+                <ExternalLink size={11} /> <span className="hidden sm:inline">Open</span>
+              </a>
+            )}
+            <span className="text-xs text-zinc-600">{fmtRelative(svc.last_checked_at)}</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
+          <button onClick={() => onCheck(svc.id)} disabled={checking} className="text-xs px-2 py-1 rounded border border-border hover:bg-secondary transition-colors text-muted-foreground disabled:opacity-50 flex items-center gap-1">
+            {checking ? <RefreshCw size={10} className="animate-spin" /> : <RefreshCw size={10} />}
+            <span className="hidden sm:inline">{checking ? "Checking" : "Check"}</span>
+          </button>
+          {svc.port && (
+            <button onClick={() => onRestart(svc.id)} disabled={restarting} className="text-xs px-2 py-1 rounded border border-blue-500/20 hover:bg-blue-500/10 text-blue-400 transition-colors disabled:opacity-50 flex items-center gap-1">
+              {restarting ? <RefreshCw size={10} className="animate-spin" /> : null}
+              <span>{restarting ? "Restart…" : "Restart"}</span>
+            </button>
+          )}
+          {!svc.is_auto_detected && (
+            <button onClick={() => onDelete(svc.id)} className="text-xs px-2 py-1 rounded border border-red-500/20 hover:bg-red-500/10 text-red-400 transition-colors">Remove</button>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -79,9 +94,9 @@ function AddServiceModal({ onClose, onAdded }: { onClose: () => void; onAdded: (
         <h3 className="text-base font-semibold">Register Service</h3>
         <form onSubmit={submit} className="space-y-3">
           {[
-            { label: "Name *", key: "name", placeholder: "m365-barometer" },
+            { label: "Name *", key: "name", placeholder: "my-service" },
             { label: "Endpoint", key: "endpoint", placeholder: "https://..." },
-            { label: "Port", key: "port", placeholder: "51017" },
+            { label: "Port", key: "port", placeholder: "50165" },
             { label: "Notes", key: "notes", placeholder: "Optional notes" },
           ].map(f => (
             <div key={f.key}>
@@ -113,6 +128,7 @@ export default function ServicesPage() {
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
   const [checking, setChecking] = useState<string | null>(null);
+  const [restarting, setRestarting] = useState<string | null>(null);
 
   useEffect(() => {
     load();
@@ -147,6 +163,17 @@ export default function ServicesPage() {
       load();
     } catch { toast.error("Check failed"); }
     finally { setChecking(null); }
+  }
+
+  async function restartService(id: string) {
+    setRestarting(id);
+    try {
+      const res = await fetch(`/api/services/${id}/restart`, { method: "POST" });
+      if (!res.ok) { toast.error("Restart failed"); return; }
+      toast.success("Service restarting...");
+      setTimeout(() => load(), 1000);
+    } catch { toast.error("Restart failed"); }
+    finally { setRestarting(null); }
   }
 
   async function deleteService(id: string) {
@@ -202,7 +229,7 @@ export default function ServicesPage() {
                 <span className="text-xs font-medium text-muted-foreground">Auto-Detected ({autoDetected.length})</span>
               </div>
               {autoDetected.map(svc => (
-                <ServiceRow key={svc.id} svc={svc} onCheck={checkService} onDelete={deleteService} />
+                <ServiceRow key={svc.id} svc={svc} onCheck={checkService} onDelete={deleteService} onRestart={restartService} checking={checking === svc.id} restarting={restarting === svc.id} />
               ))}
             </div>
           )}
@@ -212,7 +239,7 @@ export default function ServicesPage() {
                 <span className="text-xs font-medium text-muted-foreground">Registered ({manual.length})</span>
               </div>
               {manual.map(svc => (
-                <ServiceRow key={svc.id} svc={svc} onCheck={checkService} onDelete={deleteService} />
+                <ServiceRow key={svc.id} svc={svc} onCheck={checkService} onDelete={deleteService} onRestart={restartService} checking={checking === svc.id} restarting={restarting === svc.id} />
               ))}
             </div>
           )}

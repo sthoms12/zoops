@@ -1,23 +1,17 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { RefreshCw, AlertTriangle, CheckCircle2, Clock, XCircle, ChevronRight, Activity, Inbox } from "lucide-react";
-import { cn, fmtRelative, STATUS_COLORS, statusLabel } from "@/lib/utils";
+import { RefreshCw, AlertTriangle, ChevronRight, Activity, Inbox, Zap, Clock } from "lucide-react";
+import { cn, fmtRelative } from "@/lib/utils";
 import { toast } from "sonner";
 
 interface DashboardData {
   stats: {
-    activeWorkflows: number;
-    staleWorkflows: number;
-    failedRuns: number;
-    pendingReviews: number;
-    successRate: number;
-    totalRuns: number;
-    serviceCount: number;
+    automationsCount: number;
+    liveSites: number;
     discoveredCount: number;
-    browserTaskCount: number;
   };
   healthWarnings: string[];
-  recentRuns: any[];
+  recentAutomations: any[];
   latestHealth: any;
   lastScanAt: string | null;
 }
@@ -47,23 +41,16 @@ function StatCard({ label, value, sub, color = "default", to }: { label: string;
   return to ? <Link to={to}>{content}</Link> : content;
 }
 
-function RunStatusIcon({ status }: { status: string }) {
-  switch (status) {
-    case "completed": return <CheckCircle2 size={14} className="text-emerald-400 shrink-0" />;
-    case "failed": return <XCircle size={14} className="text-red-400 shrink-0" />;
-    case "needs_review": return <AlertTriangle size={14} className="text-orange-400 shrink-0" />;
-    default: return <Clock size={14} className="text-zinc-400 shrink-0" />;
-  }
-}
-
 export default function CommandCenter({ onRefresh }: { onRefresh: () => void }) {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
 
   useEffect(() => { loadData(); }, []);
 
   async function loadData() {
     setLoading(true);
+    setLoadError(false);
     try {
       const res = await fetch("/api/dashboard");
       if (res.ok) {
@@ -79,8 +66,14 @@ export default function CommandCenter({ onRefresh }: { onRefresh: () => void }) 
           }
         } catch {}
         setData(dashboardData);
+      } else {
+        setLoadError(true);
+        toast.error("Failed to load dashboard");
       }
-    } catch { toast.error("Failed to load dashboard"); }
+    } catch {
+      setLoadError(true);
+      toast.error("Failed to load dashboard");
+    }
     finally { setLoading(false); }
   }
 
@@ -95,13 +88,24 @@ export default function CommandCenter({ onRefresh }: { onRefresh: () => void }) 
     } catch { toast.error("Scan failed"); }
   }
 
-  if (!data) return (
+  if (loading) return (
     <div className="p-6 flex items-center gap-2 text-muted-foreground">
       <RefreshCw size={16} className="animate-spin" /> Loading Command Center...
     </div>
   );
 
-  const { stats, healthWarnings, recentRuns, latestHealth } = data;
+  if (loadError || !data) return (
+    <div className="p-6 space-y-3">
+      <div className="flex items-center gap-2 text-red-400 text-sm">
+        <AlertTriangle size={16} /> Failed to load dashboard
+      </div>
+      <button onClick={loadData} className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md bg-secondary border border-border text-muted-foreground hover:text-foreground">
+        <RefreshCw size={12} /> Retry
+      </button>
+    </div>
+  );
+
+  const { stats, healthWarnings, recentAutomations, latestHealth } = data;
   const healthColor = latestHealth?.overall_status === "healthy" ? "text-emerald-400" :
     latestHealth?.overall_status === "warning" ? "text-yellow-400" : "text-red-400";
 
@@ -146,43 +150,34 @@ export default function CommandCenter({ onRefresh }: { onRefresh: () => void }) 
       )}
 
       {/* Stats grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <StatCard label="Active Workflows" value={stats.activeWorkflows} to="/workflows" color={stats.activeWorkflows > 0 ? "green" : "default"} />
-        <StatCard label="Stale Workflows" value={stats.staleWorkflows} to="/workflows" color={stats.staleWorkflows > 0 ? "yellow" : "green"} sub={stats.staleWorkflows > 0 ? "Need runs" : "All current"} />
-        <StatCard label="Failed Runs" value={stats.failedRuns} to="/runs" color={stats.failedRuns > 0 ? "red" : "green"} sub={`of ${stats.totalRuns} total`} />
-        <StatCard label="Pending Review" value={stats.pendingReviews} to="/review" color={stats.pendingReviews > 0 ? "yellow" : "green"} />
-      </div>
-
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <StatCard label="Run Success Rate" value={`${stats.successRate}%`} color={stats.successRate >= 80 ? "green" : stats.successRate >= 50 ? "yellow" : "red"} />
-        <StatCard label="Services Tracked" value={stats.serviceCount} to="/services" color="blue" />
-        <StatCard label="Browser Tasks" value={stats.browserTaskCount} to="/browser-tasks" color="default" />
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+        <StatCard label="Active Automations" value={stats.automationsCount} to="/automations" color="blue" />
+        <StatCard label="Sites & Services" value={stats.liveSites} to="/sites" color="blue" />
         <StatCard label="Discovered Items" value={stats.discoveredCount} to="/discovery" color="blue" />
       </div>
 
       {/* Two-column section */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Recent runs */}
+        {/* Upcoming automations */}
         <div className="bg-card border border-border rounded-lg">
           <div className="flex items-center justify-between px-4 py-3 border-b border-border">
             <div className="flex items-center gap-2">
-              <Activity size={14} className="text-muted-foreground" />
-              <span className="text-sm font-medium">Recent Runs</span>
+              <Zap size={14} className="text-muted-foreground" />
+              <span className="text-sm font-medium">Upcoming Automations</span>
             </div>
-            <Link to="/runs" className="text-xs text-muted-foreground hover:text-foreground transition-colors">View all →</Link>
+            <Link to="/automations" className="text-xs text-muted-foreground hover:text-foreground transition-colors">View all →</Link>
           </div>
           <div className="divide-y divide-border">
-            {recentRuns.length === 0 && (
-              <p className="text-sm text-muted-foreground p-4">No runs yet</p>
+            {recentAutomations.length === 0 && (
+              <p className="text-sm text-muted-foreground p-4">No automations found</p>
             )}
-            {recentRuns.slice(0, 6).map((run: any) => (
-              <Link key={run.id} to={`/runs/${run.id}`} className="flex items-center gap-3 px-4 py-2.5 hover:bg-white/5 transition-colors">
-                <RunStatusIcon status={run.status} />
+            {recentAutomations.map((a: any) => (
+              <Link key={a.id} to={`/automations/${a.id}`} className="flex items-center gap-3 px-4 py-2.5 hover:bg-white/5 transition-colors">
+                <Zap size={12} className={cn("shrink-0", a.active ? "text-emerald-400" : "text-zinc-600")} />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm truncate font-medium">{run.workflow_name}</p>
-                  <p className="text-xs text-muted-foreground">{fmtRelative(run.created_at)}</p>
+                  <p className="text-sm truncate font-medium">{a.title}</p>
+                  {a.next_run && <p className="text-xs text-muted-foreground flex items-center gap-1"><Clock size={10} /> {fmtRelative(a.next_run)}</p>}
                 </div>
-                <span className={cn("status-badge border", STATUS_COLORS[run.status] || STATUS_COLORS.pending)}>{statusLabel(run.status)}</span>
               </Link>
             ))}
           </div>
@@ -225,8 +220,6 @@ export default function CommandCenter({ onRefresh }: { onRefresh: () => void }) 
       {/* Quick links */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
         {[
-          { to: "/workflows", label: "New Workflow", icon: "+" },
-          { to: "/browser-tasks", label: "New Browser Task", icon: "+" },
           { to: "/review", label: "Review Queue", icon: <Inbox size={13} /> },
           { to: "/health", label: "Run Health Check", icon: <Activity size={13} /> },
         ].map(item => (
