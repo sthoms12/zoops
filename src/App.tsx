@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import {
   LayoutDashboard, Search, Server,
   Brain, Activity, Settings as SettingsIcon, Zap, Menu, X,
-  Rss, Terminal, Database, GitCompare, Globe, Calendar as CalendarIcon,
+  Terminal, Database, GitCompare, Globe, Calendar as CalendarIcon,
 } from "lucide-react";
 import { Toaster } from "sonner";
 import { cn } from "@/lib/utils";
@@ -19,7 +19,6 @@ import SettingsPage from "@/pages/Settings";
 import AutomationsPage from "@/pages/Automations";
 import AutomationCalendarPage from "@/pages/AutomationCalendar";
 import AutomationDetail from "@/pages/AutomationDetail";
-import FeedPage from "@/pages/Feed";
 import LogsPage from "@/pages/Logs";
 import ExplorerPage from "@/pages/Explorer";
 import ChangelogPage from "@/pages/Changelog";
@@ -49,7 +48,6 @@ const navGroups: NavGroup[] = [
   {
     label: "Operations",
     items: [
-      { to: "/feed", icon: <Rss size={15} />, label: "Intelligence Feed" },
       { to: "/sites", icon: <Globe size={15} />, label: "Sites & Services" },
       { to: "/services", icon: <Server size={15} />, label: "Services" },
       { to: "/automations", icon: <Zap size={15} />, label: "Automations" },
@@ -249,7 +247,6 @@ function AppShell() {
             <Route path="/automations" element={<ErrorBoundary label="Automations"><AutomationsPage /></ErrorBoundary>} />
             <Route path="/automations/:id" element={<ErrorBoundary label="Automation Detail"><AutomationDetail /></ErrorBoundary>} />
             <Route path="/calendar" element={<ErrorBoundary label="Schedule"><AutomationCalendarPage /></ErrorBoundary>} />
-            <Route path="/feed" element={<ErrorBoundary label="Intelligence Feed"><FeedPage /></ErrorBoundary>} />
             <Route path="/logs" element={<ErrorBoundary label="Logs"><LogsPage /></ErrorBoundary>} />
             <Route path="/explorer" element={<ErrorBoundary label="DB Explorer"><ExplorerPage /></ErrorBoundary>} />
             <Route path="/changelog" element={<ErrorBoundary label="Workspace Changelog"><ChangelogPage /></ErrorBoundary>} />

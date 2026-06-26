@@ -470,11 +470,6 @@ app.get("/api/changelog", c => {
   })));
 });
 
-// ── FEED (intelligence output) ────────────────────────────────────
-app.get("/api/feed", c => {
-  return c.json({ runs: [], workflows: [] });
-});
-
 // ── LOGS ──────────────────────────────────────────────────────────
 app.get("/api/logs/list", c => {
   try {
