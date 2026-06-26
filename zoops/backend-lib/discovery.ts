@@ -293,6 +293,50 @@ export function syncZoSitesToServices(): { added: string[]; total: number } {
   return { added, total };
 }
 
+export function syncSpaceRoutesFromSnapshot(): { added: string[]; total: number } {
+  const snapshotPath = join(import.meta.dir, "space-routes-snapshot.json");
+  if (!existsSync(snapshotPath)) return { added: [], total: 0 };
+
+  type RouteEntry = { path: string; route_type: string; public: boolean };
+  let routes: RouteEntry[] = [];
+  try {
+    routes = JSON.parse(readFileSync(snapshotPath, "utf-8")) as RouteEntry[];
+  } catch { return { added: [], total: 0 }; }
+
+  const BASE = "https://thomstech.zo.space";
+  const upsert = db.prepare(`
+    INSERT INTO services (id, name, type, status, endpoint, notes, last_checked_at, updated_at)
+    VALUES (?, ?, 'space-page', 'detected', ?, ?, datetime('now'), datetime('now'))
+    ON CONFLICT(id) DO UPDATE SET
+      name=excluded.name,
+      endpoint=excluded.endpoint,
+      notes=excluded.notes,
+      last_checked_at=excluded.last_checked_at,
+      updated_at=excluded.updated_at
+  `);
+
+  const added: string[] = [];
+  for (const r of routes) {
+    // Skip internal probes and all API routes
+    if (r.path.startsWith("/__") || r.route_type === "api") continue;
+    const slug = r.path.replace(/^\//, "") || "home";
+    const id = `space_${slug}`;
+    const knownLabels: Record<string, string> = { "zoops": "ZoOps" };
+    const defaultLabel = r.path === "/" ? "Home" : slug.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+    const label = knownLabels[slug] ?? defaultLabel;
+    const name = `Space: ${label}`;
+    const endpoint = `${BASE}${r.path}`;
+    const visibility = r.public ? "public" : "private";
+    const notes = `zo.space ${r.route_type} route · ${visibility}`;
+    const existing = db.prepare("SELECT id FROM services WHERE id=?").get(id);
+    upsert.run(id, name, endpoint, notes);
+    if (!existing) added.push(name);
+  }
+
+  const total = (db.prepare("SELECT COUNT(*) as c FROM services WHERE type='space-page'").get() as { c: number })?.c ?? 0;
+  return { added, total };
+}
+
 export function detectServicesFromLogs(): Array<{ name: string; logPath: string; errPath: string | null }> {
   const services: Array<{ name: string; logPath: string; errPath: string | null }> = [];
   try {

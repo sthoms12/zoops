@@ -2,7 +2,7 @@ import { serveStatic } from "hono/bun";
 import { Hono } from "hono";
 import config from "./zosite.json";
 import { db, initDb, generateId, now } from "./backend-lib/db";
-import { runDiscovery, persistDiscovery, detectServicesFromLogs, syncZoSitesToServices } from "./backend-lib/discovery";
+import { runDiscovery, persistDiscovery, detectServicesFromLogs, syncZoSitesToServices, syncSpaceRoutesFromSnapshot } from "./backend-lib/discovery";
 import { runHealthCheck } from "./backend-lib/health";
 import { seedIfEmpty } from "./backend-lib/seed";
 import { syncAutomationsFromSnapshot, syncAutomationsFromZo } from "./backend-lib/automations";
@@ -106,6 +106,8 @@ setTimeout(() => {
     console.log(`ZoOps: discovered ${items.length} local items`);
     const sync = syncZoSitesToServices();
     if (sync.added.length > 0) console.log(`ZoOps: auto-synced new Zo Sites: ${sync.added.join(", ")}`);
+    const spaceSync = syncSpaceRoutesFromSnapshot();
+    if (spaceSync.added.length > 0) console.log(`ZoOps: synced space routes: ${spaceSync.added.join(", ")}`);
   } catch (e) {
     console.error("Discovery scan error:", e);
   }
@@ -205,7 +207,8 @@ app.post("/api/discovery/scan", async c => {
 app.post("/api/sites/sync", c => {
   try {
     const result = syncZoSitesToServices();
-    return c.json({ ok: true, added: result.added, total: result.total });
+    const spaceResult = syncSpaceRoutesFromSnapshot();
+    return c.json({ ok: true, added: [...result.added, ...spaceResult.added], total: result.total + spaceResult.total });
   } catch (e: any) {
     return c.json({ error: e.message }, 500);
   }
